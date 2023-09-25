@@ -17,6 +17,7 @@ module.exports = {
   .addStringOption(option => option.setName('title').setDescription('What ? (Code an AI)').setRequired(true))
   .addStringOption(option => option.setName('lesson').setDescription('For ? (Concurp)').setRequired(true))
   .addStringOption(option => option.setName('end').setDescription('When ? (yyyy-mm-dd)').setRequired(true)),
+  
 	async execute(interaction) {
     const career = interaction.options.getString('career');
     console.log(career)
@@ -40,7 +41,7 @@ module.exports = {
 };
 
 function uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+    return 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
     .replace(/[xy]/g, function (c) {
         const r = Math.random() * 16 | 0, 
             v = c == 'x' ? r : (r & 0x3 | 0x8);
