@@ -2,8 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
-  .setName('time')
-  .setDescription('Show timetable'),
+    .setName('time')
+    .setDescription('Show timetable'),
 	async execute(interaction) {
     let out = "## Timetable ISC-IL-2a 2023-2024 Fall\n"
     out += "```| Time        | Mon               | Tue      | Wed         | Thu          | Fri       |\n"

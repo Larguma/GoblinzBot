@@ -1,9 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
-  data: new SlashCommandBuilder()
-  .setName('goblinz')
-  .setDescription('BOUAHHH'),
+  data: new SlashCommandBuilder().setName('goblinz').setDescription('BOUAHHH'),
 	async execute(interaction) {
     let out = "```\n"
     out += "/##(\n"
