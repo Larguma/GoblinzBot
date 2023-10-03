@@ -14,8 +14,8 @@ module.exports = {
         { name: 'RS', value: 'RS' },
         { name: 'BOTH', value: 'BOTH' },
 			))
-  .addStringOption(option => option.setName('title').setDescription('What ? (Code an AI)').setRequired(true))
-  .addStringOption(option => option.setName('lesson').setDescription('For ? (Concurp)').setRequired(true))
+  .addStringOption(option => option.setName('lesson').setDescription('Lesson ? (Maths)').setRequired(true))
+  .addStringOption(option => option.setName('title').setDescription('Task ? (Ex. 1-2-3)').setRequired(true))
   .addStringOption(option => option.setName('end').setDescription('When ? (yyyy-mm-dd)').setRequired(true)),
   
 	async execute(interaction) {
