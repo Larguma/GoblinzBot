@@ -32,6 +32,7 @@ module.exports = {
         if (Date.parse(value.end) > Date.now() - 3 * 24 * 60 * 60 * 1000)
         {
           if (Date.parse(value.end) < Date.now()) out += "- ";
+          else if (value.exa == "true") out += "+ ";
           else out += "  ";
           out += value.end + " - " + value.lesson + ": " + value.title + "\n";
         }

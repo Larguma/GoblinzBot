@@ -16,7 +16,14 @@ module.exports = {
 			))
   .addStringOption(option => option.setName('lesson').setDescription('Lesson ? (Maths)').setRequired(true))
   .addStringOption(option => option.setName('title').setDescription('Task ? (Ex. 1-2-3)').setRequired(true))
-  .addStringOption(option => option.setName('end').setDescription('When ? (yyyy-mm-dd)').setRequired(true)),
+  .addStringOption(option => option.setName('end').setDescription('When ? (yyyy-mm-dd)').setRequired(true))
+  .addStringOption(option =>
+    option.setName('exa')
+    .setDescription('Is exa ?')
+    .addChoices(
+      { name: 'False', value: 'false' },
+      { name: 'True', value: 'true' },
+    )),
   
 	async execute(interaction) {
     const career = interaction.options.getString('career');
@@ -24,11 +31,12 @@ module.exports = {
     const title = interaction.options.getString('title');
     const lesson = interaction.options.getString('lesson');
     const end = interaction.options.getString('end');
+    const exa = interaction.options.getString('exa');
     if (isNaN(Date.parse(end))) return interaction.reply({ content: "Not a valid date", ephemeral: true });
 
     const db = new Level('db', { valueEncoding: 'json' })
     try {
-     await db.put(uuidv4(), {"career": career, "title": title, "lesson": lesson, "end": end})
+     await db.put(uuidv4(), {"career": career, "title": title, "lesson": lesson, "end": end, "exa": exa})
      db.close()
      return interaction.reply({ content: "Task added (" + lesson + ")" , ephemeral: false });
     }
