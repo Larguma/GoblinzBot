@@ -12,9 +12,11 @@ module.exports = {
         .setRequired(true)
         .addChoices(
           { name: "Admin", value: "Admin" },
-          { name: "Ado", value: "Ado" },
+          { name: "Ado (A)", value: "Ado (A)" },
+          { name: "Ado (B)", value: "Ado (B)" },
           { name: "Algo", value: "Algo" },
-          { name: "Concurp", value: "Concurp" },
+          { name: "Concurp (A)", value: "Concurp (A)" },
+          { name: "Concurp (B)", value: "Concurp (B)" },
           { name: "DevOps", value: "DevOps" },
           { name: "Maths", value: "Maths" },
           { name: "Mobile", value: "Mobile" },
