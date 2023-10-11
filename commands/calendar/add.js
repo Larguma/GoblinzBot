@@ -7,20 +7,22 @@ module.exports = {
     .setDescription("Add a task")
     .addStringOption((option) =>
       option
-        .setName("career")
-        .setDescription("Who ?")
+        .setName("lesson")
+        .setDescription("Lesson ?")
         .setRequired(true)
         .addChoices(
-          { name: "IL", value: "IL" },
-          { name: "RS", value: "RS" },
-          { name: "BOTH", value: "BOTH" }
+          { name: "Admin", value: "Admin" },
+          { name: "Ado", value: "Ado" },
+          { name: "Algo", value: "Algo" },
+          { name: "Concurp", value: "Concurp" },
+          { name: "DevOps", value: "DevOps" },
+          { name: "Maths", value: "Maths" },
+          { name: "Mobile", value: "Mobile" },
+          { name: "Physique", value: "Physique" },
+          { name: "Projet", value: "Projet" },
+          { name: "Stats", value: "Stats" },
+          { name: "SysInfo", value: "SysInfo" }
         )
-    )
-    .addStringOption((option) =>
-      option
-        .setName("lesson")
-        .setDescription("Lesson ? (Maths)")
-        .setRequired(true)
     )
     .addStringOption((option) =>
       option
@@ -45,7 +47,6 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    const career = interaction.options.getString("career");
     const title = interaction.options.getString("title");
     const lesson = interaction.options.getString("lesson");
     const end = interaction.options.getString("end");
@@ -59,9 +60,8 @@ module.exports = {
     const db = new Level("db", { valueEncoding: "json" });
     try {
       await db.put(uuidv4(), {
-        career: career,
-        title: title,
         lesson: lesson,
+        title: title,
         end: end,
         exa: exa,
       });
@@ -71,7 +71,7 @@ module.exports = {
         ephemeral: false,
       });
     } catch {
-      console.log(career, title, lesson, end);
+      console.log(title, lesson, end);
       db.close();
       return interaction.reply({ content: "ERROR", ephemeral: true });
     }
