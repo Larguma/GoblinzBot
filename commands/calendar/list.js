@@ -17,12 +17,13 @@ module.exports = {
       items.push(value);
     }
 
-    let out = "## TODO\n```diff\n";
+    let out = "## TODO\n```ansi\n";
     for (const value of items.sort((x, y) => (x.end > y.end ? 1 : -1))) {
       if (Date.parse(value.end) > Date.now() - 3 * 24 * 60 * 60 * 1000) {
-        if (Date.parse(value.end) < Date.now()) out += "- ";
-        else if (value.exa == "true") out += "+ ";
-        else out += "  ";
+        if (Date.parse(value.end) < Date.now() - 1 * 24 * 60 * 60 * 1000) out += "[2;31m";
+        else if (Date.parse(value.end) < Date.now()) out += "[2;33m";
+        else if (value.exa == "true") out += "[2;32m";
+        else out += "[2;30m[2;37m";
         out += value.end + " - " + value.lesson + ": " + value.title + "\n";
       }
     }
