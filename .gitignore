@@ -2,3 +2,8 @@ node_modules
 db
 .env
 config.json
+.vscode/
+
+GoblinzBot/bin/
+
+GoblinzBot/obj/
