@@ -6,8 +6,12 @@ using DSharpPlus.VoiceNext;
 
 public class GibberishModule : BaseCommandModule
 {
+  /// <summary>
+  /// Plays a gibberish sound effect in the user's current voice channel.
+  /// </summary>
+  /// <param name="ctx">The command context.</param>
   [Command("gibberish")]
-  public static async Task Gibberish(CommandContext ctx)
+  public async Task Gibberish(CommandContext ctx)
   {
     await ctx.Message.DeleteAsync();
     DiscordChannel channel = ctx.Member.VoiceState.Channel;
@@ -22,7 +26,6 @@ public class GibberishModule : BaseCommandModule
     await pcm.DisposeAsync();
     connection.Disconnect();
   }
-
 
   private static Stream ConvertAudioToPcm(string filePath)
   {

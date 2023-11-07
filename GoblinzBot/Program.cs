@@ -1,22 +1,25 @@
-﻿using System.Text.Json;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.VoiceNext;
-using GoblinzBot.Model;
+using Microsoft.Extensions.Configuration;
 
 // Read config file
-string text = File.ReadAllText(@"../config/config.json");
-Config config = JsonSerializer.Deserialize<Config>(text);
+var builder = new ConfigurationBuilder()
+  .SetBasePath(Directory.GetCurrentDirectory())
+  .AddJsonFile("appsettings.json", optional: false);
+
+IConfiguration config = builder.Build();
+DiscordSettings discordSettings = config.GetSection("DiscordSettings").Get<DiscordSettings>();
 
 Random rdn = new();
 
 DiscordClient discord = new(new DiscordConfiguration()
 {
-  Token = config.Token,
+  Token = discordSettings.TokenDev,
   TokenType = TokenType.Bot,
   Intents = DiscordIntents.AllUnprivileged |
     DiscordIntents.MessageContents |
@@ -52,13 +55,13 @@ discord.MessageCreated += async (s, e) =>
 
   foreach (string msg in msgContent)
   {
-    if (config.Lists.ItsJoever.Contains(msg))
+    if (discordSettings.Lists.ItsJoever.Contains(msg))
       await e.Message.RespondAsync("https://i.kym-cdn.com/photos/images/newsfeed/002/360/758/f0b.jpg");
   };
 
   // Check full message
-  if (config.Lists.RockAndStone.Any(rock => message.Contains(rock.ToLower())))
-    await e.Message.RespondAsync(config.Lists.RockAndStone[rdn.Next(0, config.Lists.RockAndStone.Count)]);
+  if (discordSettings.Lists.RockAndStone.Any(rock => message.Contains(rock.ToLower())))
+    await e.Message.RespondAsync(discordSettings.Lists.RockAndStone[rdn.Next(0, discordSettings.Lists.RockAndStone.Count)]);
 
   if (rdn.Next(0, 101) == 100)
     await e.Message.RespondAsync("Ptite bière !?");

@@ -134,3 +134,9 @@ _NCrunch*
 .vscode/
 
 config/config.json
+
+node_modules/
+
+db/
+
+GoblinzBot/appsettings.json
