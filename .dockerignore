@@ -1,9 +1,0 @@
-.env
-.git
-.gitignore
-config.json
-package-lock.json
-npm-debug.log
-docker-command.txt
-node_modules
-db/*

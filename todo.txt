@@ -1,0 +1,6 @@
+- !gibberish {name}
+  - delete message
+  - create voice channel
+  - move {name} inside channel
+  - play gibberish sound
+  - delete voice channel
