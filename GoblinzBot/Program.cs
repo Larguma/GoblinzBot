@@ -105,6 +105,12 @@ internal class Program
 
       if (rdn.Next(0, 101) == 100)
         await e.Message.RespondAsync("Y t'faut une 'tite bière");
+
+      // Good/Bad bot
+      if (message.ToLower() == "good bot")
+        await e.Message.RespondAsync(discordSettings.Lists.GoodBot[rdn.Next(0, discordSettings.Lists.GoodBot.Count)]);
+      if (message.ToLower() == "bad bot")
+        await e.Message.RespondAsync(discordSettings.Lists.BadBot[rdn.Next(0, discordSettings.Lists.BadBot.Count)]);
     };
 
     // On button press

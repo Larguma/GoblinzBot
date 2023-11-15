@@ -16,4 +16,8 @@ public class Lists
     public required List<string> ItsJoever { get; set; }
 
     public required List<string> RockAndStone { get; set; }
+
+    public required List<string> GoodBot { get; set; }
+    
+    public required List<string> BadBot { get; set; }
 }
