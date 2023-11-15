@@ -160,7 +160,7 @@ internal class Program
         var response = await s.GetInteractivity().WaitForModalAsync(">modal_edit_task");
         item.Lesson = response.Result.Values["lesson"];
         item.Title = response.Result.Values["title"];
-        item.End = DateTime.Parse(response.Result.Values["end"]).AddDays(1);
+        item.End = DateTime.Parse(response.Result.Values["end"]);
         item.IsExam = bool.Parse(response.Result.Values["isExam"]);
 
         CalendarCommands.UpdateTask(item);
