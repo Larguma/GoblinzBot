@@ -13,11 +13,8 @@ using MongoDB.Bson;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using DSharpPlus.ModalCommands;
-using DSharpPlus.CommandsNext.Attributes;
-using System.Text.Json;
 using MongoDB.Driver;
 using System.Globalization;
-
 
 internal class Program
 {
@@ -94,11 +91,11 @@ internal class Program
 
       // Check word by word
       string message = e.Message.Content.Trim().ToLower();
-      string[] msgContent = message.Split("\\s+");
+      string[] msgContent = message.Split(" ");
 
       foreach (string msg in msgContent)
       {
-        if (discordSettings.Lists.ItsJoever.Contains(msg) && rdn.NextInt64(0, 2) == 1)
+        if (discordSettings.Lists.ItsJoever.Contains(msg) && rdn.Next(0, 101) >= 75)
           await e.Message.RespondAsync("https://i.kym-cdn.com/photos/images/newsfeed/002/360/758/f0b.jpg");
       };
 

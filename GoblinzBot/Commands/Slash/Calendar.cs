@@ -59,7 +59,7 @@ public class CalendarCommands : ApplicationCommandModule
       GuildId = ctx.Guild.Id.ToString()
     });
 
-    await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Task added!"));
+    await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Task added! {course} - {name} ({date})"));
   }
 
   [SlashCommand("list", "List all tasks")]
