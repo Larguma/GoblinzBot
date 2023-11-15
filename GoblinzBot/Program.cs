@@ -59,7 +59,7 @@ internal class Program
 
     DiscordClient discord = new(new DiscordConfiguration()
     {
-      Token = discordSettings.TokenDev,
+      Token = discordSettings.Token,
       TokenType = TokenType.Bot,
       Intents = DiscordIntents.AllUnprivileged |
         DiscordIntents.MessageContents |
