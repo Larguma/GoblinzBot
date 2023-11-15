@@ -5,7 +5,7 @@ using DSharpPlus.SlashCommands;
 public class HelpCommands : ApplicationCommandModule
 {
   [SlashCommand("help", "Get some help")]
-  public static async void HelpCommand(InteractionContext ctx) =>
+  public async void Help(InteractionContext ctx) =>
     await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
-      new DiscordInteractionResponseBuilder().WithContent("TODO lol"));
+      new DiscordInteractionResponseBuilder().WithContent("TODO: implement help command"));
 }

@@ -15,4 +15,6 @@ public class Item
     public DateTime End { get; set; } = DateTime.MinValue;
 
     public bool IsExam { get; set; } = false;
+
+    public string GuildId { get; set; } = string.Empty;
 }

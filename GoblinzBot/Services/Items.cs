@@ -8,9 +8,9 @@ public class ItemsService
 
   public ItemsService(IOptions<DatabaseSettings> databaseSettings)
   {
-    var mongoClient = new MongoClient(databaseSettings.Value.ConnectionString);
+    MongoClient mongoClient = new(databaseSettings.Value.ConnectionString);
 
-    var mongoDatabase = mongoClient.GetDatabase(databaseSettings.Value.DatabaseName);
+    IMongoDatabase mongoDatabase = mongoClient.GetDatabase(databaseSettings.Value.DatabaseName);
 
     _itemsCollection = mongoDatabase.GetCollection<Item>(databaseSettings.Value.ItemsCollectionName);
   }
