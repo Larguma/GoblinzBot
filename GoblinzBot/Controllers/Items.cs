@@ -19,6 +19,6 @@ public class ItemsController
   public async Task Delete(ObjectId id) =>
     await _itemsService.RemoveAsync(id);
 
-  public async Task Update(ObjectId id, Item updatedItem) =>
-    await _itemsService.UpdateAsync(id, updatedItem);
+  public async Task Update(Item updatedItem) =>
+    await _itemsService.UpdateAsync(updatedItem);
 }

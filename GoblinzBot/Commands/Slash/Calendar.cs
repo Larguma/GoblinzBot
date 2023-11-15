@@ -32,7 +32,7 @@ public class CalendarCommands : ApplicationCommandModule
   public async void Add(InteractionContext ctx,
     [Option("course", "The course")] CourseList course,
     [Option("name", "The name of the task")] string name,
-    [Option("date", "The date of the task (yyyy-mm-dd)")] string date,
+    [Option("date", "The date of the task (yyyy-MM-dd)")] string date,
     [Option("isExam", "Is it an exam?")] bool isExam = false)
   {
     if (ctx.Guild == null)
@@ -77,23 +77,39 @@ public class CalendarCommands : ApplicationCommandModule
     StringBuilder sb = await GetFormatedListAsync(ctx.Guild.Id.ToString());
 
     await ctx.EditResponseAsync(new DiscordWebhookBuilder()
-    .AddComponents(new DiscordButtonComponent[]
-    {
-      new (ButtonStyle.Primary, "btn_refresh_list", "Refresh list", false, new DiscordComponentEmoji("📝")),
-      new (ButtonStyle.Danger, "btn_delete_obsolete", "Delete old tasks", false, new DiscordComponentEmoji("🗑️"))
-    }).WithContent(sb.ToString()));
+    .AddComponents(Program.GetListButtonComponent())
+    .WithContent(sb.ToString()));
   }
 
-  internal static async Task<DiscordSelectComponent> GetDropdownListAsync(string guildId)
+  [SlashCommand("del", "Delete a task")]
+  public async void Delete(InteractionContext ctx)
+  {
+    if (ctx.Guild == null)
+    {
+      await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
+        new DiscordInteractionResponseBuilder().WithContent("This command can only be used in a server!"));
+      return;
+    }
+
+    List<Item> items = await _itemsController.Index();
+    if (items.Count == 0)
+    {
+      await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
+        new DiscordInteractionResponseBuilder().WithContent("No tasks!"));
+      return;
+    }
+
+    await ctx.DeferAsync();
+    await ctx.EditResponseAsync(new DiscordWebhookBuilder()
+      .AddComponents(await GetDropdownListAsync(ctx.Guild.Id.ToString(), "Select a task to delete (no confirmation)", "delete")));
+  }
+
+  internal static async Task<DiscordSelectComponent> GetDropdownListAsync(string guildId, string placeholder, string id)
   {
     List<Item> items = await _itemsController.Index();
-
-    if (items.Count == 0)
-      return new DiscordSelectComponent("dropdown", null, null, false, 1, 2);
+    List<DiscordSelectComponentOption> options = new();
 
     items.Sort((x, y) => x.End.CompareTo(y.End));
-
-    List<DiscordSelectComponentOption> options = new();
 
     items.ForEach(x =>
     {
@@ -105,7 +121,7 @@ public class CalendarCommands : ApplicationCommandModule
     });
 
     // Make the dropdown
-    return new DiscordSelectComponent("dropdown_tasks", "Select a task to delete", options);
+    return new DiscordSelectComponent($"dropdown_tasks_{id}", placeholder, options);
   }
 
   internal static async Task<StringBuilder> GetFormatedListAsync(string guildId)
@@ -159,23 +175,6 @@ public class CalendarCommands : ApplicationCommandModule
     // \u001b[0;47mWhite background\u001b[0;0m
   }
 
-  [SlashCommand("obsolete", "Delete old tasks")]
-  public async void DeleteObsolete(InteractionContext ctx)
-  {
-    if (ctx.Guild == null)
-    {
-      await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
-        new DiscordInteractionResponseBuilder().WithContent("This command can only be used in a server!"));
-      return;
-    }
-
-    await ctx.DeferAsync();
-
-    await DeleteObsolete();
-
-    await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Old tasks deleted!"));
-  }
-
   internal static async Task DeleteObsolete()
   {
     // List cleanup
@@ -193,23 +192,18 @@ public class CalendarCommands : ApplicationCommandModule
     });
   }
 
-  [SlashCommand("del", "Delete a task")]
-  public async void Delete(InteractionContext ctx)
-  {
-    if (ctx.Guild == null)
-    {
-      await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
-        new DiscordInteractionResponseBuilder().WithContent("This command can only be used in a server!"));
-      return;
-    }
-    
-    await ctx.DeferAsync();
-    await ctx.EditResponseAsync(new DiscordWebhookBuilder()
-    .AddComponents(await GetDropdownListAsync(ctx.Guild.Id.ToString())));
-  }
-
   internal static async Task Delete(ObjectId id)
   {
     await _itemsController.Delete(id);
+  }
+
+  internal static async Task<Item> GetTaskById(string v)
+  {
+    return await _itemsController.Details(ObjectId.Parse(v));
+  }
+
+  internal static async void UpdateTask(Item updatedItem)
+  {
+    await _itemsController.Update(updatedItem);
   }
 }

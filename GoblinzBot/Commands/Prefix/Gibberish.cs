@@ -3,37 +3,10 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.VoiceNext;
+using Microsoft.Extensions.Logging;
 
 public class GibberishModule : BaseCommandModule
 {
-  /// <summary>
-  /// Plays a gibberish sound effect in the user's current voice channel.
-  /// </summary>
-  /// <param name="ctx"></param>
-  [Command("gibberish")]
-  [Description("Play a gibberish sound effect")]
-  public async Task Gibberish(CommandContext ctx)
-  {
-    if (ctx.Member == null || ctx.Member.VoiceState.Channel == null)
-    {
-      await ctx.RespondAsync("You must be in a voice channel!");
-      return;
-    }
-
-    await ctx.Message.DeleteAsync();
-    DiscordChannel channel = ctx.Member.VoiceState.Channel;
-    await channel.ConnectAsync();
-
-    VoiceNextExtension vnext = ctx.Client.GetVoiceNext();
-    VoiceNextConnection connection = vnext.GetConnection(ctx.Guild);
-
-    VoiceTransmitSink transmit = connection.GetTransmitSink();
-    Stream pcm = ConvertAudioToPcm(Directory.GetCurrentDirectory() + "/Sounds/gibberish.mp3");
-    await pcm.CopyToAsync(transmit);
-    await pcm.DisposeAsync();
-    connection.Disconnect();
-  }
-
   [Command("linker")]
   [Description("Print a linker error")]
   public async Task LinkerError(CommandContext ctx)
@@ -64,19 +37,6 @@ public class GibberishModule : BaseCommandModule
   {
     await DeleteMessageAsync(ctx);
     await ctx.RespondAsync("https://media.tenor.com/RfJzepsDdmYAAAAC/rat-spinning.gif");
-  }
-
-  private Stream ConvertAudioToPcm(string filePath)
-  {
-    Process? ffmpeg = Process.Start(new ProcessStartInfo
-    {
-      FileName = "ffmpeg",
-      Arguments = $@"-i ""{filePath}"" -ac 2 -f s16le -ar 48000 pipe:1",
-      RedirectStandardOutput = true,
-      UseShellExecute = false
-    });
-
-    return ffmpeg.StandardOutput.BaseStream;
   }
 
   private async Task DeleteMessageAsync(CommandContext ctx)

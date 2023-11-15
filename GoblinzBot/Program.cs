@@ -10,6 +10,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MongoDB.Bson;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using DSharpPlus.ModalCommands;
+using DSharpPlus.CommandsNext.Attributes;
+using System.Text.Json;
+using MongoDB.Driver;
+using System.Globalization;
 
 
 internal class Program
@@ -27,6 +34,12 @@ internal class Program
     DiscordSettings discordSettings = config.GetSection(nameof(DiscordSettings)).Get<DiscordSettings>();
 
     Random rdn = new();
+
+    Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger();
+
+    ILoggerFactory logFactory = new LoggerFactory().AddSerilog();
 
     using IHost host = CreateHostBuilder(args).Build();
     using IServiceScope scope = host.Services.CreateScope();
@@ -46,12 +59,13 @@ internal class Program
 
     DiscordClient discord = new(new DiscordConfiguration()
     {
-      Token = discordSettings.Token,
+      Token = discordSettings.TokenDev,
       TokenType = TokenType.Bot,
       Intents = DiscordIntents.AllUnprivileged |
         DiscordIntents.MessageContents |
         DiscordIntents.Guilds |
-        DiscordIntents.GuildMessages
+        DiscordIntents.GuildMessages,
+      LoggerFactory = logFactory
     });
 
     discord.UseInteractivity(new InteractivityConfiguration()
@@ -66,7 +80,6 @@ internal class Program
     });
     commands.RegisterCommands<GibberishModule>();
     commands.RegisterCommands<UsefulModule>();
-
 
     SlashCommandsExtension slash = discord.UseSlashCommands();
     slash.RegisterCommands<HelpCommands>();
@@ -85,7 +98,7 @@ internal class Program
 
       foreach (string msg in msgContent)
       {
-        if (discordSettings.Lists.ItsJoever.Contains(msg))
+        if (discordSettings.Lists.ItsJoever.Contains(msg) && rdn.NextInt64(0, 2) == 1)
           await e.Message.RespondAsync("https://i.kym-cdn.com/photos/images/newsfeed/002/360/758/f0b.jpg");
       };
 
@@ -100,40 +113,80 @@ internal class Program
     // On button press
     discord.ComponentInteractionCreated += async (s, e) =>
     {
-      await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
       if (e.Id == "btn_delete_obsolete")
       {
         await CalendarCommands.DeleteObsolete();
       }
 
+      if (e.Id == "btn_edit_task")
+      {
+        await e.Interaction.CreateResponseAsync(InteractionResponseType.UpdateMessage, new DiscordInteractionResponseBuilder()
+        .AddComponents(await CalendarCommands.GetDropdownListAsync(e.Guild.Id.ToString(), "Select a task to edit", "edit")));
+      }
+
       if (e.Id == "btn_delete_obsolete" ||
           e.Id == "btn_refresh_list")
       {
-        await e.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder()
-          .AddComponents(new DiscordButtonComponent[]
-          {
-            new (ButtonStyle.Primary, "btn_refresh_list", "Refresh list", false, new DiscordComponentEmoji("📝")),
-            new (ButtonStyle.Danger, "btn_delete_obsolete", "Delete old tasks", false, new DiscordComponentEmoji("🗑️"))
-          }).WithContent(CalendarCommands.GetFormatedListAsync(e.Guild.Id.ToString()).Result.ToString()));
+        await e.Interaction.CreateResponseAsync(InteractionResponseType.UpdateMessage, new DiscordInteractionResponseBuilder()
+          .AddComponents(GetListButtonComponent())
+          .WithContent(CalendarCommands.GetFormatedListAsync(e.Guild.Id.ToString()).Result.ToString()));
       }
 
-      if (e.Id == "dropdown_tasks") 
+      if (e.Id == "dropdown_tasks_delete")
       {
-        await CalendarCommands.Delete(ObjectId.Parse(e.Values[0].Replace("task_", "")));
+        if (e.Values[0] != "no_tasks")
+          await CalendarCommands.Delete(ObjectId.Parse(e.Values[0].Replace("task_", "")));
 
+        await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
         await e.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder()
-          .AddComponents(new DiscordButtonComponent[]
-          {
-            new (ButtonStyle.Primary, "btn_refresh_list", "Refresh list", false, new DiscordComponentEmoji("📝")),
-            new (ButtonStyle.Danger, "btn_delete_obsolete", "Delete old tasks", false, new DiscordComponentEmoji("🗑️"))
-          }).WithContent(CalendarCommands.GetFormatedListAsync(e.Guild.Id.ToString()).Result.ToString()));
-      
+          .AddComponents(GetListButtonComponent())
+          .WithContent(CalendarCommands.GetFormatedListAsync(e.Guild.Id.ToString()).Result.ToString()));
+      }
+
+      if (e.Id == "dropdown_tasks_edit")
+      {
+        Item item = CalendarCommands.GetTaskById(e.Values[0].Replace("task_", "")).Result;
+        ObjectId id = item.Id;
+        string end = item.End.ToString("yyyy-MM-dd", CultureInfo.CreateSpecificCulture("fr-CH"));
+
+        DiscordInteractionResponseBuilder modal = ModalBuilder.Create("modal_edit_task")
+          .WithTitle("Edit a task")
+          .AddComponents(new TextInputComponent("Course", "lesson", item.Lesson, item.Lesson))
+          .AddComponents(new TextInputComponent("Name", "title", item.Title, item.Title))
+          .AddComponents(new TextInputComponent("Date", "end", "yyyy-MM-dd", end))
+          .AddComponents(new TextInputComponent("Is Exam", "isExam", item.IsExam.ToString(), item.IsExam.ToString()));
+        await e.Interaction.CreateResponseAsync(InteractionResponseType.Modal, modal);
+
+        var response = await s.GetInteractivity().WaitForModalAsync(">modal_edit_task");
+        item.Lesson = response.Result.Values["lesson"];
+        item.Title = response.Result.Values["title"];
+        item.End = DateTime.Parse(response.Result.Values["end"]).AddDays(1);
+        item.IsExam = bool.Parse(response.Result.Values["isExam"]);
+
+        CalendarCommands.UpdateTask(item);
       }
     };
 
+    // On modal submit
+    discord.ModalSubmitted += async (s, e) =>
+    {
+      await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+      await e.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder()
+        .AddComponents(GetListButtonComponent())
+        .WithContent(CalendarCommands.GetFormatedListAsync(e.Interaction.GuildId.ToString()).Result.ToString()));
+    };
 
     await discord.ConnectAsync();
     await Task.Delay(-1);
+  }
+
+  internal static DiscordButtonComponent[] GetListButtonComponent()
+  {
+    return new DiscordButtonComponent[]
+    {
+      new (ButtonStyle.Primary, "btn_refresh_list", "Refresh list", false, new DiscordComponentEmoji("🔄")),
+      new (ButtonStyle.Secondary, "btn_edit_task", "Edit a task", false, new DiscordComponentEmoji("📝")),
+      new (ButtonStyle.Danger, "btn_delete_obsolete", "Delete old tasks", false, new DiscordComponentEmoji("🗑️"))
+    };
   }
 }
