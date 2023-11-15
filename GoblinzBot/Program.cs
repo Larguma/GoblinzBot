@@ -79,8 +79,6 @@ internal class Program
     {
       if (e.Author.IsBot) return;
 
-      Console.WriteLine($"{e.Author.Username}: {e.Message.Content}");
-
       // Check word by word
       string message = e.Message.Content.Trim().ToLower();
       string[] msgContent = message.Split("\\s+");
@@ -122,7 +120,6 @@ internal class Program
 
       if (e.Id == "dropdown_tasks") 
       {
-        Console.WriteLine(e.Values.ToString());
         await CalendarCommands.Delete(ObjectId.Parse(e.Values[0].Replace("task_", "")));
 
         await e.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder()
@@ -133,9 +130,6 @@ internal class Program
           }).WithContent(CalendarCommands.GetFormatedListAsync(e.Guild.Id.ToString()).Result.ToString()));
       
       }
-
-      // On dropdown select
-      Console.WriteLine(e.Id);
     };
 
 
