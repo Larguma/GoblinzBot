@@ -5,6 +5,8 @@ services:
     image: larguma/goblinzbot:latest
     container_name: goblinzbot_backend
     restart: always
+    volumes:
+      - /home/larguma/docker_data/cal-discord-bot/appsettings.json:/app/appsettings.json
     depends_on:
       - db
 
