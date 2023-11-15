@@ -30,11 +30,11 @@ fi
 echo "Building and pushing the docker images"
 
 # Build and push the docker image for the goblinzbot : latest
-docker build -t larguma/goblinzbot:latest ./Goblinzbot/
+docker build -t larguma/goblinzbot:latest GoblinzBot/
 docker push larguma/goblinzbot:latest
 
 # Build and push the docker image for the goblinzbot : version x.x.x
-docker build -t larguma/goblinzbot:$appversion ./Goblinzbot/
+docker build -t larguma/goblinzbot:$appversion GoblinzBot/
 docker push larguma/goblinzbot:$appversion
 
 echo "Done"
