@@ -49,9 +49,9 @@ public class OpenaiController
       }
     }
 
-    var timeLeft = DateTime.Now - counter.LastUsed;
+    var timeLeft = counter.LastUsed.AddMinutes(2) - DateTime.Now;
 
-    return "Goblinz is still sleeping for " + timeLeft.TotalSeconds + " seconds";
+    return "Goblinz is still sleeping for " + timeLeft.TotalSeconds.ToString("ss") + " seconds";
   }
 
   private async void CreateBaseCounter() {
