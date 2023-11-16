@@ -1,9 +1,5 @@
-using System.Diagnostics;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.VoiceNext;
-using Microsoft.Extensions.Logging;
 
 public class GibberishModule : BaseCommandModule
 {

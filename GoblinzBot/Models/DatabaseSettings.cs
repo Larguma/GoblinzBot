@@ -6,5 +6,5 @@ public class DatabaseSettings
 
     public string ItemsCollectionName { get; set; } = null!;
 
-    public string SequenceCollectionName { get; set; } = null!;
+    public string OpenaiCollectionName { get; set; } = null!;
 }

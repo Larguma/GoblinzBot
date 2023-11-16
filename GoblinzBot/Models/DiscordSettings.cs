@@ -8,6 +8,8 @@ public class DiscordSettings
 
     public required string GuildId { get; set; }
 
+    public required string OpenaiToken { get; set; }
+
     public required Lists Lists { get; set; }
 }
 

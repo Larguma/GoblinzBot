@@ -51,6 +51,7 @@ internal class Program
             Services.Configure<DatabaseSettings>(config.GetSection(nameof(DatabaseSettings)));
             Services.AddSingleton<ItemsService>();
             Services.AddSingleton<ItemsController>();
+            Services.AddSingleton<OpenaiService>();
           });
     }
 
@@ -84,6 +85,8 @@ internal class Program
 
     discord.UseVoiceNext();
 
+    OpenaiController openai = new(discordSettings.OpenaiToken);
+
     // On new message
     discord.MessageCreated += async (s, e) =>
     {
@@ -111,6 +114,14 @@ internal class Program
         await e.Message.RespondAsync(discordSettings.Lists.GoodBot[rdn.Next(0, discordSettings.Lists.GoodBot.Count)]);
       if (message.ToLower() == "bad bot")
         await e.Message.RespondAsync(discordSettings.Lists.BadBot[rdn.Next(0, discordSettings.Lists.BadBot.Count)]);
+
+      // Mention with openai
+      if (message.Contains(s.CurrentUser.Mention))
+      {
+        message = message.Replace(s.CurrentUser.Mention, "");
+        string response = await openai.GetResponseAsync(message);
+        await e.Message.RespondAsync(response);
+      }
     };
 
     // On button press
