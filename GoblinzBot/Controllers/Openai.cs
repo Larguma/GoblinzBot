@@ -22,7 +22,7 @@ public class OpenaiController
     if (counters.Count == 0) CreateBaseCounter();
 
     OpenaiCounter counter = counters.FirstOrDefault();
-    if (counter.LastUsed < DateTime.Now.AddMinutes(-5))
+    if (counter.LastUsed < DateTime.Now.AddMinutes(-2))
     {
       counter.LastUsed = DateTime.Now;
       await _openaiService.UpdateAsync(counter);
@@ -49,7 +49,9 @@ public class OpenaiController
       }
     }
 
-    return "Goblinz is sleeping until " + counter.LastUsed.AddMinutes(5).ToString("HH:mm") + " !";
+    var timeLeft = DateTime.Now - counter.LastUsed;
+
+    return "Goblinz is still sleeping for " + timeLeft.TotalSeconds + " seconds";
   }
 
   private async void CreateBaseCounter() {
