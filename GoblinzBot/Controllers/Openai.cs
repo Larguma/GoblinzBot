@@ -24,7 +24,6 @@ public class OpenaiController
     OpenaiCounter counter = counters.FirstOrDefault();
     if (counter.LastUsed < DateTime.Now.AddMinutes(-5))
     {
-      string aled = "\nLast used: " + counter.LastUsed + "    ||    Now: " + DateTime.Now.AddMinutes(-5);
       counter.LastUsed = DateTime.Now;
       await _openaiService.UpdateAsync(counter);
 
@@ -46,11 +45,11 @@ public class OpenaiController
       if (response.IsSuccessStatusCode)
       {
         OpenaiResponse openaiResponse = await response.Content.ReadFromJsonAsync<OpenaiResponse>();
-        return openaiResponse.Choices[0].Message.Content + aled;
+        return openaiResponse.Choices[0].Message.Content;
       }
     }
 
-    return "Goblinz is sleeping";
+    return "Goblinz is sleeping until " + counter.LastUsed.AddMinutes(5).ToString("HH:mm") + " !";
   }
 
   private async void CreateBaseCounter() {
