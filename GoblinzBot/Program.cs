@@ -1,4 +1,4 @@
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
@@ -19,6 +19,7 @@ using System.Globalization;
 internal class Program
 {
   public static IServiceProvider? Services { get; set; }
+  public static DiscordSettings? DiscordSettings { get; set; }
 
   private static async Task Main(string[] args)
   {
@@ -28,7 +29,7 @@ internal class Program
       .AddJsonFile("appsettings.json", optional: false);
 
     IConfiguration config = builder.Build();
-    DiscordSettings discordSettings = config.GetSection(nameof(DiscordSettings)).Get<DiscordSettings>();
+    DiscordSettings = config.GetSection(nameof(DiscordSettings)).Get<DiscordSettings>();
 
     Random rdn = new();
 
@@ -38,8 +39,8 @@ internal class Program
 
     ILoggerFactory logFactory = new LoggerFactory().AddSerilog();
 
-    using IHost host = CreateHostBuilder(args).Build();
-    using IServiceScope scope = host.Services.CreateScope();
+    IHost host = CreateHostBuilder(args).Build();
+    IServiceScope scope = host.Services.CreateScope();
 
     Services = scope.ServiceProvider;
 
@@ -57,12 +58,9 @@ internal class Program
 
     DiscordClient discord = new(new DiscordConfiguration()
     {
-      Token = discordSettings.Token,
+      Token = DiscordSettings.Token,
       TokenType = TokenType.Bot,
-      Intents = DiscordIntents.AllUnprivileged |
-        DiscordIntents.MessageContents |
-        DiscordIntents.Guilds |
-        DiscordIntents.GuildMessages,
+      Intents = DiscordIntents.All,
       LoggerFactory = logFactory
     });
 
@@ -85,7 +83,7 @@ internal class Program
 
     discord.UseVoiceNext();
 
-    OpenaiController openai = new(discordSettings.OpenaiToken);
+    OpenaiController openai = new(DiscordSettings.OpenaiToken);
 
     // On new message
     discord.MessageCreated += async (s, e) =>
@@ -98,22 +96,22 @@ internal class Program
 
       foreach (string msg in msgContent)
       {
-        if (discordSettings.Lists.ItsJoever.Contains(msg) && rdn.Next(0, 101) >= 75)
+        if (DiscordSettings.Lists.ItsJoever.Contains(msg) && rdn.Next(0, 101) >= 75)
           await e.Message.RespondAsync("https://i.kym-cdn.com/photos/images/newsfeed/002/360/758/f0b.jpg");
       };
 
       // Check full message
-      if (discordSettings.Lists.RockAndStone.Any(rock => message.Contains(rock.ToLower())))
-        await e.Message.RespondAsync(discordSettings.Lists.RockAndStone[rdn.Next(0, discordSettings.Lists.RockAndStone.Count)]);
+      if (DiscordSettings.Lists.RockAndStone.Any(rock => message.Contains(rock.ToLower())))
+        await e.Message.RespondAsync(DiscordSettings.Lists.RockAndStone[rdn.Next(0, DiscordSettings.Lists.RockAndStone.Count)]);
 
       if (rdn.Next(0, 101) == 100)
         await e.Message.RespondAsync("Y t'faut une 'tite bière");
 
       // Good/Bad bot
       if (message.ToLower() == "good bot")
-        await e.Message.RespondAsync(discordSettings.Lists.GoodBot[rdn.Next(0, discordSettings.Lists.GoodBot.Count)]);
+        await e.Message.RespondAsync(DiscordSettings.Lists.GoodBot[rdn.Next(0, DiscordSettings.Lists.GoodBot.Count)]);
       if (message.ToLower() == "bad bot")
-        await e.Message.RespondAsync(discordSettings.Lists.BadBot[rdn.Next(0, discordSettings.Lists.BadBot.Count)]);
+        await e.Message.RespondAsync(DiscordSettings.Lists.BadBot[rdn.Next(0, DiscordSettings.Lists.BadBot.Count)]);
 
       // Mention with openai
       if (message.Contains(s.CurrentUser.Mention))

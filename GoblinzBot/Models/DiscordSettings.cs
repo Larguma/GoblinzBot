@@ -1,25 +1,29 @@
 public class DiscordSettings
 {
-    public required string Token { get; set; }
+    public string Token { get; set; } = string.Empty;
 
-    public required string TokenDev { get; set; }
+    public string TokenDev { get; set; } = string.Empty;
 
-    public required string ClientId { get; set; }
+    public string ClientId { get; set; } = string.Empty;
 
-    public required string GuildId { get; set; }
+    public string GuildId { get; set; } = string.Empty;
 
-    public required string OpenaiToken { get; set; }
+    public string OpenaiToken { get; set; } = string.Empty;
 
-    public required Lists Lists { get; set; }
+    public Lists Lists { get; set; } = new();
 }
 
 public class Lists
 {
-    public required List<string> ItsJoever { get; set; }
+    public List<string> ItsJoever { get; set; } = new();
 
-    public required List<string> RockAndStone { get; set; }
+    public List<string> RockAndStone { get; set; } = new();
 
-    public required List<string> GoodBot { get; set; }
+    public List<string> GoodBot { get; set; } = new();
 
-    public required List<string> BadBot { get; set; }
+    public List<string> BadBot { get; set; } = new();
+
+    public List<string> RussianDead { get; set; } = new();
+
+    public List<string> RussianAlive { get; set; } = new();
 }
