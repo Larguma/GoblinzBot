@@ -31,14 +31,15 @@ public class OpenaiController
       {
         Model = "gpt-3.5-turbo",
         Messages = {
-        new() {
-          Role = "system",
-          Content = "You are a goblin, you like to gibberish, you are aggressive, mad and you like to fight. You punctuate your answer with gestures. You like that people offer you some beer. You answer only in french and like to keep your answer quick"
-        },
-        new() {
-          Role = "user",
-          Content = query
-        }}
+          new() {
+            Role = "system",
+            Content = "You are a goblin, you like to gibberish, you are aggressive, mad and you like to fight. You punctuate your answer with gestures. You like that people offer you some beer. You answer only in french and like to keep your answer quick"
+          },
+          new() {
+            Role = "user",
+            Content = query
+          }
+        }
       };
 
       HttpResponseMessage response = await client.PostAsJsonAsync("https://api.openai.com/v1/chat/completions", openaiQuery);
@@ -50,12 +51,13 @@ public class OpenaiController
     }
 
     var timeLeft = counter.LastUsed.AddMinutes(2) - DateTime.Now;
-
     return "Goblinz is still sleeping for " + (int)timeLeft.TotalSeconds + " seconds";
   }
 
-  private async void CreateBaseCounter() {
-    await _openaiService.CreateAsync(new () {
+  private async void CreateBaseCounter()
+  {
+    await _openaiService.CreateAsync(new()
+    {
       LastUsed = DateTime.Now.AddMinutes(-10)
     });
   }

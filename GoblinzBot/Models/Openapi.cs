@@ -8,13 +8,15 @@ public class OpenaiQuery
   public List<OpenaiMessage> Messages { get; set; } = new();
 }
 
-public class OpenaiMessage {
+public class OpenaiMessage
+{
   public string Role { get; set; } = string.Empty;
 
   public string Content { get; set; } = string.Empty;
 }
 
-public class OpenaiResponse {
+public class OpenaiResponse
+{
   public string Id { get; set; } = string.Empty;
   public string Object { get; set; } = string.Empty;
   public long Created { get; set; } = 0;
@@ -24,13 +26,15 @@ public class OpenaiResponse {
 
 }
 
-public class OpenaiChoice {
+public class OpenaiChoice
+{
   public int Index { get; set; } = 0;
   public OpenaiMessage Message { get; set; } = new();
   public string FinishReason { get; set; } = string.Empty;
 }
 
-public class OpenaiUsage {
+public class OpenaiUsage
+{
   public int Prompt_Tokens { get; set; } = 0;
   public int Completion_Tokens { get; set; } = 0;
   public int Total_Tokens { get; set; } = 0;
@@ -38,9 +42,9 @@ public class OpenaiUsage {
 
 public class OpenaiCounter
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public ObjectId Id { get; set; }
+  [BsonId]
+  [BsonRepresentation(BsonType.ObjectId)]
+  public ObjectId Id { get; set; }
 
-    public DateTime LastUsed { get; set; } = DateTime.MinValue;
+  public DateTime LastUsed { get; set; } = DateTime.MinValue;
 }
