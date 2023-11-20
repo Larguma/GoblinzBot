@@ -1,4 +1,4 @@
-﻿using DSharpPlus;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
@@ -118,9 +118,10 @@ internal class Program
       // Mention with openai
       if (message.Contains(s.CurrentUser.Mention))
       {
+        DiscordMessage discordMessage = await e.Message.RespondAsync("Goblinz is thinking...");
         message = message.Replace(s.CurrentUser.Mention, "");
         string response = await openai.GetResponseAsync(message);
-        await e.Message.RespondAsync(response);
+        await discordMessage.ModifyAsync(response);
       }
     };
 
