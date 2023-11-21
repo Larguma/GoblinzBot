@@ -1,9 +1,13 @@
+using System.Text.RegularExpressions;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using HtmlAgilityPack;
 
 public class HelpCommands : ApplicationCommandModule
 {
+  private HttpClient http = new();
+
   [SlashCommand("help", "Get some help")]
   public async void Help(InteractionContext ctx)
   {
@@ -27,6 +31,8 @@ public class HelpCommands : ApplicationCommandModule
     embed.AddField("/add", "Ah, tâche sur le calendrier, tu veux mettre de l'ordre dans ton bazar ! Groumpf !\nEssaye quelque chose comme ça pour la commande `/add` :```/add course:\"Magie Noire\" name:\"Brew the darkest elixir, or face the consequences! Groumpf!\" date:2023-11-20```\nVoilà, ça devrait leur montrer que t'es pas là pour rigoler avec les devoirs ! Grrr, organise-toi bien et que les gobelins de la productivité soient avec toi ! Groumpf !");
     embed.AddField("/delete", "Bien, si tu veux te débarrasser d'une tâche comme un gobelin dévore les restes d'un festin, voici une commande `/del` qui devrait faire le job.\nGroumpf ! Balance ça et regarde la tâche disparaître plus vite qu'un elfe qui a vu un troll affamé ! Grrr, la magie des commandes, c'est quelque chose, hein ? Groumpf !");
     embed.AddField("/list", "Pour afficher toutes les tâches du calendrier de la classe comme un recensement des butins après une bataille, voici une commande `/list` qui devrait te plaire.\nGroumpf ! Ça va te donner une liste bien rangée de toutes les tâches à accomplir, comme les trophées d'un chasseur de dragons ! Grrr, n'oublie pas de vérifier ça régulièrement, sinon ça pourrait être pire que de se retrouver nez à nez avec un basilic ! Groumpf !");
+
+    embed.AddField("/weather", "Ah, tu veux savoir si le soleil brille ou si les nuages préparent une attaque ! Voici une commande `/weather` pour ça :\n```/weather location:\"Gobelinvillia\"```\nGroumpf ! Change \"Gobelinvillia\" par le nom de la ville que tu veux, et cette commande te donnera un rapport météo plus précis qu'un oracle gobelin ! Grrr, c'est toujours utile de savoir si tu auras besoin d'un parapluie ou d'une armure anti-orage ! Groumpf !");
 
     await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
       new DiscordInteractionResponseBuilder().AddEmbed(embed));
@@ -62,5 +68,30 @@ public class HelpCommands : ApplicationCommandModule
 
     await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
       new DiscordInteractionResponseBuilder().WithContent("Feedback sent!"));
+  }
+
+  [SlashCommand("weather", "Get the weather")]
+  public async void Weather(InteractionContext ctx,
+    [Option("location", "where")] string location = "Fribourg")
+  {
+    await ctx.DeferAsync();
+
+    string? html = http.GetAsync($"http://wttr.in/{location}?0").Result.Content.ReadAsStringAsync().Result;
+
+    HtmlDocument doc = new();
+    doc.LoadHtml(html);
+    HtmlNode node = doc.DocumentNode.SelectSingleNode("//pre");
+    string value = node.InnerText;
+    value = Regex.Replace(value, @"(\r\n|\r|\n)+", "\n");
+    value = value.Replace("&quot;", "\"");
+    value = "```" + value + "```";
+
+    DiscordEmbedBuilder embed = new()
+    {
+      Color = DiscordColor.Azure,
+      Description = value
+    };
+
+    await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
   }
 }

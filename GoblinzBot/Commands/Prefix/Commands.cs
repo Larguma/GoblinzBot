@@ -94,32 +94,6 @@ public class PrefixCommandsModule : BaseCommandModule
     await ctx.RespondAsync(url);
   }
 
-  [Command("weather")]
-  [Description("Get the weather for Fribourg")]
-  public async Task GetWeather(CommandContext ctx)
-  {
-    await DeleteMessageAsync(ctx);
-    string? html = http.GetAsync("http://wttr.in/Fribourg?0").Result.Content.ReadAsStringAsync().Result;
-
-    HtmlDocument doc = new ();
-    doc.LoadHtml(html);
-
-    HtmlNode node = doc.DocumentNode.SelectSingleNode("//pre");
-
-    string value = node.InnerText;
-    value = Regex.Replace(value, @"(\r\n|\r|\n)+", "\n");
-    value = value.Replace("&quot;", "\"");
-    value = "```" + value + "```";
-
-    DiscordEmbedBuilder embed = new()
-    {
-      Color = DiscordColor.Azure,
-      Description = value
-    };
-
-    await ctx.RespondAsync(embed);
-  }
-
   [Command("time")]
   [Description("Print the IL timetable")]
   public async Task ILTimetable(CommandContext ctx) {

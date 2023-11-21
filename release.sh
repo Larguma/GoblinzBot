@@ -3,8 +3,8 @@
 # Set the version of the app: major.minor.patch
 # Change major if breaking changes
 # Change minor if new features
-# Change patch if bug fixes
-appversion="1.7.0"
+# Change patch if bug fixes/minor changes
+appversion="1.7.1"
 
 echo "Checking branches..."
 if git rev-parse --abbrev-ref HEAD | grep -iq "main" ;then
