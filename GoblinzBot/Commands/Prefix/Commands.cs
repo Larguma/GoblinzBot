@@ -1,8 +1,10 @@
+using System.Text.RegularExpressions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using HtmlAgilityPack;
 
-public class GibberishModule : BaseCommandModule
+public class PrefixCommandsModule : BaseCommandModule
 {
   private Random rdn = new();
   private HttpClient http = new();
@@ -69,10 +71,11 @@ public class GibberishModule : BaseCommandModule
     {
       Color = color,
       Description = quote,
-      Author = new() {
-          Name = ctx.Member.DisplayName,
-          IconUrl = ctx.Member.AvatarUrl
-        }
+      Author = new()
+      {
+        Name = ctx.Member.DisplayName,
+        IconUrl = ctx.Member.AvatarUrl
+      }
     };
 
     await ctx.RespondAsync(embed);
@@ -87,16 +90,43 @@ public class GibberishModule : BaseCommandModule
     await ctx.RespondAsync(url);
   }
 
+  [Command("weather")]
+  [Description("Get the weather for Fribourg")]
+  public async Task GetWeather(CommandContext ctx)
+  {
+    await DeleteMessageAsync(ctx);
+    string? html = http.GetAsync("http://wttr.in/Fribourg?0").Result.Content.ReadAsStringAsync().Result;
+
+    HtmlDocument doc = new ();
+    doc.LoadHtml(html);
+
+    HtmlNode node = doc.DocumentNode.SelectSingleNode("//pre");
+
+    string value = node.InnerText;
+    value = Regex.Replace(value, @"(\r\n|\r|\n)+", "\n");
+    value = value.Replace("&quot;", "\"");
+    value = "```" + value + "```";
+
+    DiscordEmbedBuilder embed = new()
+    {
+      Color = DiscordColor.Azure,
+      Description = value
+    };
+
+    await ctx.RespondAsync(embed);
+  }
+
+  [Command("time")]
+  [Description("Print the IL timetable")]
+  public async Task ILTimetable(CommandContext ctx) {
+    await ctx.Message.DeleteAsync();
+    await ctx.RespondAsync("https://i.ibb.co/Ws0ZxFy/image.png");
+  }
+
   private async Task DeleteMessageAsync(CommandContext ctx)
   {
     if (ctx.Message.Author.IsBot) return;
     if (ctx.Channel.IsPrivate) return;
     await ctx.Message.DeleteAsync();
-  }
-
-  private async Task<string> GetMemeTemplate()
-  {
-    // https://imgflip.com/gif-maker/276115669/Killing-Among-us
-    return "TODO";
   }
 }

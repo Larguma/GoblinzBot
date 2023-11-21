@@ -81,8 +81,7 @@ internal class Program
     {
       StringPrefixes = new[] { "•", "!" }
     });
-    commands.RegisterCommands<GibberishModule>();
-    commands.RegisterCommands<UsefulModule>();
+    commands.RegisterCommands<PrefixCommandsModule>();
 
     SlashCommandsExtension slash = discord.UseSlashCommands();
     slash.RegisterCommands<HelpCommands>();
