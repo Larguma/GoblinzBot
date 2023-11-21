@@ -1,4 +1,4 @@
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
@@ -87,6 +87,7 @@ internal class Program
     SlashCommandsExtension slash = discord.UseSlashCommands();
     slash.RegisterCommands<HelpCommands>();
     slash.RegisterCommands<CalendarCommands>();
+    slash.RegisterCommands<FunCommands>();
 
     discord.UseVoiceNext();
 

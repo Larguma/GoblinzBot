@@ -26,4 +26,6 @@ public class Lists
     public List<string> RussianDead { get; set; } = new();
 
     public List<string> RussianAlive { get; set; } = new();
+
+    public List<string> Insult { get; set; } = new();
 }
