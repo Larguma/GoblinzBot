@@ -20,6 +20,7 @@ internal class Program
 {
   public static IServiceProvider? Services { get; set; }
   public static DiscordSettings? DiscordSettings { get; set; }
+  public static List<BannedUser> BannedUsers { get; set; } = new();
 
   private static async Task Main(string[] args)
   {
@@ -95,6 +96,17 @@ internal class Program
     discord.MessageCreated += async (s, e) =>
     {
       if (e.Author.IsBot) return;
+
+      BannedUsers.ForEach(x =>
+      {
+        if (x.Until < DateTime.Now)
+          BannedUsers.Remove(x);
+        if (x.UserId == e.Author.Id)
+        {
+          e.Message.DeleteAsync();
+          return;
+        }
+      });
 
       // Check word by word
       string message = e.Message.Content.Trim().ToLower();

@@ -63,6 +63,10 @@ public class PrefixCommandsModule : BaseCommandModule
     {
       quote = russianDead[rdn.Next(0, russianDead.Count)];
       color = DiscordColor.Red;
+      Program.BannedUsers.Add(new () {
+        UserId = ctx.User.Id,
+        Until = DateTime.Now.AddMinutes(5)
+      });
     }
     else
       quote = russianAlive[rdn.Next(0, russianAlive.Count)];
