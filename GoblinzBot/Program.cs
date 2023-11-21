@@ -97,16 +97,18 @@ internal class Program
     {
       if (e.Author.IsBot) return;
 
-      BannedUsers.ForEach(x =>
-      {
-        if (x.Until < DateTime.Now)
-          BannedUsers.Remove(x);
-        if (x.UserId == e.Author.Id)
+      // Check if user is banned
+      if (BannedUsers.Count > 0)
+        BannedUsers.ForEach(x =>
         {
-          e.Message.DeleteAsync();
-          return;
-        }
-      });
+          if (x.Until < DateTime.Now)
+            BannedUsers.Remove(x);
+          if (x.UserId == e.Author.Id)
+          {
+            e.Message.DeleteAsync();
+            return;
+          }
+        });
 
       // Check word by word
       string message = e.Message.Content.Trim().ToLower();
