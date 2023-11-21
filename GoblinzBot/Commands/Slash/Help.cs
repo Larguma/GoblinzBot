@@ -84,6 +84,7 @@ public class HelpCommands : ApplicationCommandModule
     string value = node.InnerText;
     value = Regex.Replace(value, @"(\r\n|\r|\n)+", "\n");
     value = value.Replace("&quot;", "\"");
+    value = value.Replace("&gt;", ">");
     value = "```" + value + "```";
 
     DiscordEmbedBuilder embed = new()
