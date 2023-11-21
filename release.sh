@@ -4,7 +4,7 @@
 # Change major if breaking changes
 # Change minor if new features
 # Change patch if bug fixes
-appversion="1.5.0"
+appversion="1.6.0"
 
 echo "Checking branches..."
 if git rev-parse --abbrev-ref HEAD | grep -iq "main" ;then

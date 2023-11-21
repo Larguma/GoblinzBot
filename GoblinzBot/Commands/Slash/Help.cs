@@ -5,9 +5,32 @@ using DSharpPlus.SlashCommands;
 public class HelpCommands : ApplicationCommandModule
 {
   [SlashCommand("help", "Get some help")]
-  public async void Help(InteractionContext ctx) =>
+  public async void Help(InteractionContext ctx)
+  {
+    DiscordEmbedBuilder embed = new()
+    {
+      Color = DiscordColor.Green,
+      Title = "All the help you will get",
+      Description = "Get some help for all the main slash commands",
+      Timestamp = DateTime.Now,
+      Author = new()
+      {
+        Name = ctx.Member.DisplayName,
+        IconUrl = ctx.Member.AvatarUrl
+      }
+    };
+
+    // List all command manually to provide desc but with a twist
+    embed.AddField("/help", "Ah! Toi, vouloir `/help`? Moi dire toi! `/help` pas assez, toi besoin `/destroy`, `/annihilate`, `/obliterate`! Moi, moi, moi pas perdre temps avec petite commandes insignifiantes.");
+    embed.AddField("/feedback", "Écoute bien, humain ! Pour la commande `/feedback`, tu veux un message qui soit comme une flèche dans le cœur du développeur, tu vois ? \nAlors, tape quelque chose du genre : ```/feedback message:\"Salut les développeurs ! Votre truc, parfois ça bug et ça fait des siennes comme un lutin énervé dans une taverne ! Améliorez ça vite fait, sinon je lâche les gobelins sur votre code ! Groumpf !```");
+
+    embed.AddField("/add", "Ah, tâche sur le calendrier, tu veux mettre de l'ordre dans ton bazar ! Groumpf !\nEssaye quelque chose comme ça pour la commande `/add` :```/add course:\"Magie Noire\" name:\"Brew the darkest elixir, or face the consequences! Groumpf!\" date:2023-11-20```\nVoilà, ça devrait leur montrer que t'es pas là pour rigoler avec les devoirs ! Grrr, organise-toi bien et que les gobelins de la productivité soient avec toi ! Groumpf !");
+    embed.AddField("/delete", "Bien, si tu veux te débarrasser d'une tâche comme un gobelin dévore les restes d'un festin, voici une commande `/del` qui devrait faire le job.\nGroumpf ! Balance ça et regarde la tâche disparaître plus vite qu'un elfe qui a vu un troll affamé ! Grrr, la magie des commandes, c'est quelque chose, hein ? Groumpf !");
+    embed.AddField("/list", "Pour afficher toutes les tâches du calendrier de la classe comme un recensement des butins après une bataille, voici une commande `/list` qui devrait te plaire.\nGroumpf ! Ça va te donner une liste bien rangée de toutes les tâches à accomplir, comme les trophées d'un chasseur de dragons ! Grrr, n'oublie pas de vérifier ça régulièrement, sinon ça pourrait être pire que de se retrouver nez à nez avec un basilic ! Groumpf !");
+
     await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
-      new DiscordInteractionResponseBuilder().WithContent("TODO: implement help command"));
+      new DiscordInteractionResponseBuilder().AddEmbed(embed));
+  }
 
   [SlashCommand("feedback", "Send a feedback to the dev")]
   public async void Feedback(InteractionContext ctx,
@@ -19,7 +42,7 @@ public class HelpCommands : ApplicationCommandModule
       new DiscordInteractionResponseBuilder().WithContent("This command can only be used in a server!"));
       return;
     }
-    
+
     DiscordEmbedBuilder embed = new()
     {
       Color = DiscordColor.Green,
@@ -34,7 +57,7 @@ public class HelpCommands : ApplicationCommandModule
 
     embed.AddField("Guild", $"{ctx.Guild.Name} ({ctx.Guild.Id})", true);
 
-    DiscordMember discordMember = await ctx.Guild.GetMemberAsync(152089006430093312);    
+    DiscordMember discordMember = await ctx.Guild.GetMemberAsync(152089006430093312);
     await discordMember.SendMessageAsync(embed);
 
     await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
