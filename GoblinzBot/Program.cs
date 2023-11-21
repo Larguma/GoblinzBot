@@ -1,4 +1,4 @@
-﻿using DSharpPlus;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
@@ -122,16 +122,16 @@ internal class Program
 
       // Check full message
       if (DiscordSettings.Lists.RockAndStone.Any(rock => message.Contains(rock.ToLower())))
-        await e.Message.RespondAsync(DiscordSettings.Lists.RockAndStone[rdn.Next(0, DiscordSettings.Lists.RockAndStone.Count)]);
+        await e.Message.RespondAsync(DiscordSettings.Lists.RockAndStone[rdn.Next(DiscordSettings.Lists.RockAndStone.Count)]);
 
       if (rdn.Next(0, 101) == 100)
         await e.Message.CreateReactionAsync(DiscordEmoji.FromName(s, ":beers:"));
 
       // Good/Bad bot
       if (message.ToLower() == "good bot")
-        await e.Message.RespondAsync(DiscordSettings.Lists.GoodBot[rdn.Next(0, DiscordSettings.Lists.GoodBot.Count)]);
+        await e.Message.RespondAsync(DiscordSettings.Lists.GoodBot[rdn.Next(DiscordSettings.Lists.GoodBot.Count)]);
       if (message.ToLower() == "bad bot")
-        await e.Message.RespondAsync(DiscordSettings.Lists.BadBot[rdn.Next(0, DiscordSettings.Lists.BadBot.Count)]);
+        await e.Message.RespondAsync(DiscordSettings.Lists.BadBot[rdn.Next(DiscordSettings.Lists.BadBot.Count)]);
 
       // Mention with openai
       if (message.Contains(s.CurrentUser.Mention))

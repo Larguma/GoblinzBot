@@ -1,8 +1,6 @@
-using System.Text.RegularExpressions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using HtmlAgilityPack;
 
 public class PrefixCommandsModule : BaseCommandModule
 {
@@ -61,7 +59,7 @@ public class PrefixCommandsModule : BaseCommandModule
     string quote;
     if (draw == 6)
     {
-      quote = russianDead[rdn.Next(0, russianDead.Count)];
+      quote = russianDead[rdn.Next(russianDead.Count)];
       color = DiscordColor.Red;
       Program.BannedUsers.Add(new () {
         UserId = ctx.User.Id,
@@ -69,7 +67,7 @@ public class PrefixCommandsModule : BaseCommandModule
       });
     }
     else
-      quote = russianAlive[rdn.Next(0, russianAlive.Count)];
+      quote = russianAlive[rdn.Next(russianAlive.Count)];
 
     DiscordEmbedBuilder embed = new()
     {
