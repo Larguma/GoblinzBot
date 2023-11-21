@@ -5,6 +5,7 @@ using DSharpPlus.Entities;
 public class GibberishModule : BaseCommandModule
 {
   private Random rdn = new();
+  private HttpClient http = new();
 
   [Command("linker")]
   [Description("Print a linker error")]
@@ -75,6 +76,15 @@ public class GibberishModule : BaseCommandModule
     };
 
     await ctx.RespondAsync(embed);
+  }
+
+  [Command("inspirobot")]
+  [Description("Get an image from inspirobot")]
+  public async Task Inspirobot(CommandContext ctx)
+  {
+    await DeleteMessageAsync(ctx);
+    string url = http.GetAsync("http://inspirobot.me/api?generate=true").Result.Content.ReadAsStringAsync().Result;
+    await ctx.RespondAsync(url);
   }
 
   private async Task DeleteMessageAsync(CommandContext ctx)
