@@ -123,7 +123,7 @@ internal class Program
         await e.Message.RespondAsync(DiscordSettings.Lists.RockAndStone[rdn.Next(0, DiscordSettings.Lists.RockAndStone.Count)]);
 
       if (rdn.Next(0, 101) == 100)
-        await e.Message.RespondAsync("Y t'faut une 'tite bière");
+        await e.Message.CreateReactionAsync(DiscordEmoji.FromName(s, ":beers:"));
 
       // Good/Bad bot
       if (message.ToLower() == "good bot")
