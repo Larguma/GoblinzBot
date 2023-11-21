@@ -56,9 +56,16 @@ internal class Program
           });
     }
 
+    // Get if prod or dev
+    string token;
+    if (Environment.MachineName == "warp")
+      token = DiscordSettings.TokenDev;
+    else
+      token = DiscordSettings.Token;
+
     DiscordClient discord = new(new DiscordConfiguration()
     {
-      Token = DiscordSettings.Token,
+      Token = token,
       TokenType = TokenType.Bot,
       Intents = DiscordIntents.All,
       LoggerFactory = logFactory
@@ -117,7 +124,7 @@ internal class Program
       if (message.Contains(s.CurrentUser.Mention))
       {
         DiscordMessage discordMessage = await e.Message.RespondAsync("Goblinz is thinking...");
-        Console.WriteLine($"OPENAI: {message} - {DateTime.Now} | {e.Author.Username} - {e.Channel.Name}"); 
+        Console.WriteLine($"OPENAI: {message} - {DateTime.Now} | {e.Author.Username} - {e.Channel.Name}");
         message = message.Replace(s.CurrentUser.Mention, "");
         string response = await openai.GetResponseAsync(message);
         Console.WriteLine($"OPENAI: {response} - {DateTime.Now}");
