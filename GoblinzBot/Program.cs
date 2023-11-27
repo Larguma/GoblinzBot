@@ -119,6 +119,9 @@ internal class Program
       {
         if (DiscordSettings.Lists.ItsJoever.Contains(msg) && rdn.Next(0, 101) >= 75)
           await e.Message.RespondAsync("https://i.kym-cdn.com/photos/images/newsfeed/002/360/758/f0b.jpg");
+
+        if (msg.ToLower() == "java")
+          await e.Message.RespondAsync(DiscordSettings.Lists.JavaWord[rdn.Next(DiscordSettings.Lists.JavaWord.Count)]);
       };
 
       // Check full message
@@ -127,10 +130,6 @@ internal class Program
 
       if (rdn.Next(0, 101) == 100)
         await e.Message.CreateReactionAsync(DiscordEmoji.FromName(s, ":beers:"));
-
-      if (message.ToLower().Contains("java")) {
-        await e.Message.RespondAsync(DiscordSettings.Lists.JavaWord[rdn.Next(DiscordSettings.Lists.JavaWord.Count)]);
-      }
 
       // Good/Bad bot
       if (message.ToLower() == "good bot")
