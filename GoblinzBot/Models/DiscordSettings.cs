@@ -28,4 +28,6 @@ public class Lists
     public List<string> RussianAlive { get; set; } = new();
 
     public List<string> Insult { get; set; } = new();
+
+    public List<string> JavaWord { get; set; } = new();
 }

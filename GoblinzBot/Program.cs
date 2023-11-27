@@ -128,6 +128,10 @@ internal class Program
       if (rdn.Next(0, 101) == 100)
         await e.Message.CreateReactionAsync(DiscordEmoji.FromName(s, ":beers:"));
 
+      if (message.ToLower().Contains("java")) {
+        await e.Message.RespondAsync(DiscordSettings.Lists.JavaWord[rdn.Next(DiscordSettings.Lists.JavaWord.Count)]);
+      }
+
       // Good/Bad bot
       if (message.ToLower() == "good bot")
         await e.Message.RespondAsync(DiscordSettings.Lists.GoodBot[rdn.Next(DiscordSettings.Lists.GoodBot.Count)]);
