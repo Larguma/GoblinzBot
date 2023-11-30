@@ -95,4 +95,32 @@ public class HelpCommands : ApplicationCommandModule
 
     await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
   }
+
+  [SlashCommand("poll", "Create a poll")]
+  public async void Poll(InteractionContext ctx,
+    [Option("question", "What do you want to ask")] string question,
+    [Option("options", "The options separated by ';' (max 10)")] string option)
+  {
+    await ctx.DeferAsync();
+
+    string[] numbers = new string[] { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "keycap_ten" };
+    string[] options = option.Split(';');
+    string optionsString = "";
+    int length = options.Length > 10 ? 10 : options.Length;
+
+    for (int i = 0; i < length; i++)
+      optionsString += $"\n:{numbers[i]}:  -  {options[i].Trim()}";
+
+    DiscordEmbedBuilder embed = new()
+    {
+      Color = DiscordColor.Azure,
+      Title = question,
+      Description = optionsString
+    };
+
+    DiscordMessage message = await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
+
+    for (int i = 0; i < length; i++)
+      await message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, $":{numbers[i]}:"));
+  }
 }
