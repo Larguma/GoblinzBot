@@ -137,6 +137,10 @@ internal class Program
       if (message.ToLower() == "bad bot")
         await e.Message.RespondAsync(DiscordSettings.Lists.BadBot[rdn.Next(DiscordSettings.Lists.BadBot.Count)]);
 
+      // APÉROOOOOO
+      if (message.ToLower().Contains("apero") || message.ToLower().Contains("apéro"))
+        await e.Message.RespondAsync("APÉROOOO!!");
+
       // Mention with openai
       if (message.Contains(s.CurrentUser.Mention))
       {
