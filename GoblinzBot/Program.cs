@@ -127,7 +127,7 @@ internal class Program
     {
       Color = DiscordColor.Gold,
       Title = $"Welcome {e.Member.Username} to the server",
-      Description = "Hope you enjoy your stay, please read the rules"
+      Description = "Hope you enjoy your stay, please don't read the rules"
     };
 
     await defaultChannel.SendMessageAsync(embed: welcomeEmbed);
