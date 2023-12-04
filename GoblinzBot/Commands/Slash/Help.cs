@@ -103,7 +103,7 @@ public class HelpCommands : ApplicationCommandModule
   {
     await ctx.DeferAsync();
 
-    string[] numbers = new string[] { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "keycap_ten" };
+    string[] numbers = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "keycap_ten"];
     string[] options = option.Split(';');
     string optionsString = "";
     int length = options.Length > 10 ? 10 : options.Length;

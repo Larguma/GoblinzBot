@@ -20,7 +20,7 @@ internal class Program
 {
   public static IServiceProvider? Services { get; set; }
   public static DiscordSettings? DiscordSettings { get; set; }
-  public static List<BannedUser> BannedUsers { get; set; } = new();
+  public static List<BannedUser> BannedUsers { get; set; } = [];
 
   private static async Task Main(string[] args)
   {
@@ -58,11 +58,11 @@ internal class Program
     }
 
     // Get if prod or dev
-    string token;
+    string? token;
     if (Environment.MachineName == "warp")
-      token = DiscordSettings.TokenDev;
+      token = DiscordSettings?.TokenDev;
     else
-      token = DiscordSettings.Token;
+      token = DiscordSettings?.Token;
 
     DiscordClient discord = new(new DiscordConfiguration()
     {
@@ -91,7 +91,7 @@ internal class Program
 
     discord.UseVoiceNext();
 
-    OpenaiController openai = new(DiscordSettings.OpenaiToken);
+    OpenaiController openai = new(DiscordSettings!.OpenaiToken, Services);
 
     // On new message
     discord.MessageCreated += async (s, e) =>
@@ -147,7 +147,7 @@ internal class Program
         DiscordMessage discordMessage = await e.Message.RespondAsync("Goblinz is thinking...");
         Console.WriteLine($"OPENAI: {message} - {DateTime.Now} | {e.Author.Username} - {e.Channel.Name}");
         message = message.Replace(s.CurrentUser.Mention, "");
-        string response = await openai.GetResponseAsync(message);
+        string response = await openai.GetResponseAsync(message) ?? string.Empty;
         Console.WriteLine($"OPENAI: {response} - {DateTime.Now}");
         await discordMessage.ModifyAsync(response);
       }
@@ -164,6 +164,7 @@ internal class Program
       if (e.Id == "btn_edit_task")
       {
         await e.Interaction.CreateResponseAsync(InteractionResponseType.UpdateMessage, new DiscordInteractionResponseBuilder()
+        .AddComponents(GetListButtonComponent())
         .AddComponents(await CalendarCommands.GetDropdownListAsync(e.Guild.Id.ToString(), "Select a task to edit", "edit")));
       }
 
@@ -177,10 +178,11 @@ internal class Program
 
       if (e.Id == "dropdown_tasks_delete")
       {
+        await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
         if (e.Values[0] != "no_tasks")
           await CalendarCommands.Delete(ObjectId.Parse(e.Values[0].Replace("task_", "")));
 
-        await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
         await e.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder()
           .AddComponents(GetListButtonComponent())
           .WithContent(CalendarCommands.GetFormatedListAsync(e.Guild.Id.ToString()).Result.ToString()));
@@ -188,6 +190,13 @@ internal class Program
 
       if (e.Id == "dropdown_tasks_edit")
       {
+        if (e.Values[0] == "no_tasks")
+        {
+          await e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
+            new DiscordInteractionResponseBuilder().WithContent("There is no tasks for the love of gods!"));
+          return;
+        }
+
         Item item = CalendarCommands.GetTaskById(e.Values[0].Replace("task_", "")).Result;
         ObjectId id = item.Id;
         string end = item.End.ToString("yyyy-MM-dd", CultureInfo.CreateSpecificCulture("fr-CH"));
@@ -206,7 +215,7 @@ internal class Program
         item.End = DateTime.Parse(response.Result.Values["end"]);
         item.IsExam = bool.Parse(response.Result.Values["isExam"]);
 
-        CalendarCommands.UpdateTask(item);
+        await CalendarCommands.UpdateTask(item);
       }
     };
 
@@ -214,9 +223,10 @@ internal class Program
     discord.ModalSubmitted += async (s, e) =>
     {
       await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+      string guildId = e.Interaction.GuildId.ToString() ?? string.Empty;
       await e.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder()
         .AddComponents(GetListButtonComponent())
-        .WithContent(CalendarCommands.GetFormatedListAsync(e.Interaction.GuildId.ToString()).Result.ToString()));
+        .WithContent(CalendarCommands.GetFormatedListAsync(guildId).Result.ToString()));
     };
 
     await discord.ConnectAsync();
@@ -225,11 +235,11 @@ internal class Program
 
   internal static DiscordButtonComponent[] GetListButtonComponent()
   {
-    return new DiscordButtonComponent[]
-    {
+    return
+    [
       new (ButtonStyle.Primary, "btn_refresh_list", "Refresh list", false, new DiscordComponentEmoji("🔄")),
       new (ButtonStyle.Secondary, "btn_edit_task", "Edit a task", false, new DiscordComponentEmoji("📝")),
       new (ButtonStyle.Danger, "btn_delete_obsolete", "Delete old tasks", false, new DiscordComponentEmoji("🗑️"))
-    };
+    ];
   }
 }

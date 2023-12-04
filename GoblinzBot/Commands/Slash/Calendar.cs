@@ -8,7 +8,7 @@ using MongoDB.Bson;
 
 public class CalendarCommands : ApplicationCommandModule
 {
-  private static readonly ItemsController _itemsController = Program.Services.GetRequiredService<ItemsController>();
+  private static readonly ItemsController _itemsController = Program.Services!.GetService<ItemsController>() ?? throw new ArgumentNullException(nameof(ItemsController));
   public enum CourseList
   {
     [ChoiceName("Admin")] Admin,
@@ -107,7 +107,13 @@ public class CalendarCommands : ApplicationCommandModule
   internal static async Task<DiscordSelectComponent> GetDropdownListAsync(string guildId, string placeholder, string id)
   {
     List<Item> items = await _itemsController.Index();
-    List<DiscordSelectComponentOption> options = new();
+    List<DiscordSelectComponentOption> options = [];
+
+    if (items.Count == 0)
+    {
+      options.Add(new("I said there is no tasks", "no_tasks"));
+      return new DiscordSelectComponent($"dropdown_tasks_{id}", "No tasks", options);
+    }
 
     items.Sort((x, y) => x.End.CompareTo(y.End));
 
@@ -199,10 +205,10 @@ public class CalendarCommands : ApplicationCommandModule
 
   internal static async Task<Item> GetTaskById(string v)
   {
-    return await _itemsController.Details(ObjectId.Parse(v));
+    return await _itemsController.Details(ObjectId.Parse(v)) ?? throw new Exception("Task not found");
   }
 
-  internal static async void UpdateTask(Item updatedItem)
+  internal static async Task UpdateTask(Item updatedItem)
   {
     await _itemsController.Update(updatedItem);
   }

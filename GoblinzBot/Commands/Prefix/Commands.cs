@@ -51,8 +51,8 @@ public class PrefixCommandsModule : BaseCommandModule
 
     await DeleteMessageAsync(ctx);
 
-    List<string> russianDead = Program.DiscordSettings.Lists.RussianDead;
-    List<string> russianAlive = Program.DiscordSettings.Lists.RussianAlive;
+    List<string> russianDead = Program.DiscordSettings?.Lists?.RussianDead ?? [];
+    List<string> russianAlive = Program.DiscordSettings?.Lists?.RussianAlive ?? [];
     DiscordColor color = DiscordColor.Green;
 
     int draw = rdn.Next(1, 7);
@@ -75,8 +75,8 @@ public class PrefixCommandsModule : BaseCommandModule
       Description = quote,
       Author = new()
       {
-        Name = ctx.Member.DisplayName,
-        IconUrl = ctx.Member.AvatarUrl
+        Name = ctx.Member?.DisplayName,
+        IconUrl = ctx.Member?.AvatarUrl
       }
     };
 

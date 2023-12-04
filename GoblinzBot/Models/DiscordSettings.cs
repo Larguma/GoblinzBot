@@ -15,19 +15,19 @@ public class DiscordSettings
 
 public class Lists
 {
-    public List<string> ItsJoever { get; set; } = new();
+    public List<string> ItsJoever { get; set; } = [];
 
-    public List<string> RockAndStone { get; set; } = new();
+    public List<string> RockAndStone { get; set; } = [];
 
-    public List<string> GoodBot { get; set; } = new();
+    public List<string> GoodBot { get; set; } = [];
 
-    public List<string> BadBot { get; set; } = new();
+    public List<string> BadBot { get; set; } = [];
 
-    public List<string> RussianDead { get; set; } = new();
+    public List<string> RussianDead { get; set; } = [];
 
-    public List<string> RussianAlive { get; set; } = new();
+    public List<string> RussianAlive { get; set; } = [];
 
-    public List<string> Insult { get; set; } = new();
+    public List<string> Insult { get; set; } = [];
 
-    public List<string> JavaWord { get; set; } = new();
+    public List<string> JavaWord { get; set; } = [];
 }

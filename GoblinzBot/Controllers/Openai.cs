@@ -4,25 +4,25 @@ using Microsoft.Extensions.DependencyInjection;
 
 public class OpenaiController
 {
-  static HttpClient client = new();
+  static readonly HttpClient client = new();
   private readonly OpenaiService _openaiService;
 
-  public OpenaiController(string token)
+  public OpenaiController(string token, IServiceProvider serviceProvider)
   {
     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     client.DefaultRequestHeaders.Accept.Clear();
     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-    _openaiService = Program.Services.GetRequiredService<OpenaiService>();
+    _openaiService = serviceProvider.GetRequiredService<OpenaiService>();
   }
 
-  public async Task<string> GetResponseAsync(string query)
+  public async Task<string?> GetResponseAsync(string query)
   {
     List<OpenaiCounter> counters = await _openaiService.GetAsync();
     if (counters.Count == 0) CreateBaseCounter();
 
-    OpenaiCounter counter = counters.FirstOrDefault();
-    if (counter.LastUsed < DateTime.Now.AddMinutes(-2))
+    OpenaiCounter? counter = counters.FirstOrDefault();
+    if (counter?.LastUsed < DateTime.Now.AddMinutes(-2))
     {
       counter.LastUsed = DateTime.Now;
       await _openaiService.UpdateAsync(counter);
@@ -45,13 +45,16 @@ public class OpenaiController
       HttpResponseMessage response = await client.PostAsJsonAsync("https://api.openai.com/v1/chat/completions", openaiQuery);
       if (response.IsSuccessStatusCode)
       {
-        OpenaiResponse openaiResponse = await response.Content.ReadFromJsonAsync<OpenaiResponse>();
-        return openaiResponse.Choices[0].Message.Content;
+        OpenaiResponse? openaiResponse = await response.Content.ReadFromJsonAsync<OpenaiResponse>();
+        if (openaiResponse != null)
+        {
+          return openaiResponse.Choices[0]?.Message?.Content;
+        }
       }
     }
 
-    var timeLeft = counter.LastUsed.AddMinutes(2) - DateTime.Now;
-    return "Goblinz is still sleeping for " + (int)timeLeft.TotalSeconds + " seconds";
+    var timeLeft = counter?.LastUsed.AddMinutes(2) - DateTime.Now;
+    return "Goblinz is still sleeping for " + (int)(timeLeft?.TotalSeconds ?? 0) + " seconds";
   }
 
   private async void CreateBaseCounter()

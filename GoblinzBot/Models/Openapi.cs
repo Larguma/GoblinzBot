@@ -5,7 +5,7 @@ public class OpenaiQuery
 {
   public string Model { get; set; } = string.Empty;
 
-  public List<OpenaiMessage> Messages { get; set; } = new();
+  public List<OpenaiMessage> Messages { get; set; } = [];
 }
 
 public class OpenaiMessage
