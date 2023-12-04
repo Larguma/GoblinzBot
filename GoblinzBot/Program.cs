@@ -215,6 +215,13 @@ internal class Program
       .AddComponents(await CalendarCommands.GetDropdownListAsync(e.Guild.Id.ToString(), "Select a task to edit", "edit")));
     }
 
+    if (e.Id == "btn_delete_task")
+    {
+      await e.Interaction.CreateResponseAsync(InteractionResponseType.UpdateMessage, new DiscordInteractionResponseBuilder()
+      .AddComponents(GetListButtonComponent())
+      .AddComponents(await CalendarCommands.GetDropdownListAsync(e.Guild.Id.ToString(), "Select a task to delete (no confirmation)", "delete")));
+    }
+
     if (e.Id == "btn_delete_obsolete" ||
         e.Id == "btn_refresh_list")
     {
@@ -297,7 +304,8 @@ internal class Program
     [
       new (ButtonStyle.Primary, "btn_refresh_list", "Refresh list", false, new DiscordComponentEmoji("🔄")),
       new (ButtonStyle.Secondary, "btn_edit_task", "Edit a task", false, new DiscordComponentEmoji("📝")),
-      new (ButtonStyle.Danger, "btn_delete_obsolete", "Delete old tasks", false, new DiscordComponentEmoji("🗑️"))
+      new (ButtonStyle.Danger, "btn_delete_obsolete", "Delete old tasks", false, new DiscordComponentEmoji("🗑️")),
+      new (ButtonStyle.Danger, "btn_delete_task", "Delete a task", false, new DiscordComponentEmoji("✖️")),
     ];
   }
 }
