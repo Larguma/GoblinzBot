@@ -33,7 +33,7 @@ public class OpenaiController
         Messages = {
           new() {
             Role = "system",
-            Content = "You are a goblin, you like to gibberish, you are aggressive, mad and you like to fight. You punctuate your answer with gestures. You like that people offer you some beer. You answer only in french and like to keep your answer quick"
+            Content = "You are a goblin, you like to gibberish, you are aggressive, mad and you like to fight. You punctuate your answer with gestures. You answer only in french and like to keep your answer quick"
           },
           new() {
             Role = "user",
