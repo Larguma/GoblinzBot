@@ -91,29 +91,6 @@ public class CalendarCommands : ApplicationCommandModule
     .WithContent(sb.ToString()));
   }
 
-  [SlashCommand("del", "Delete a task")]
-  public async void Delete(InteractionContext ctx)
-  {
-    if (ctx.Guild == null)
-    {
-      await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
-        new DiscordInteractionResponseBuilder().WithContent("This command can only be used in a server!"));
-      return;
-    }
-
-    List<Item> items = await _itemsController.Index();
-    if (items.Count == 0)
-    {
-      await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
-        new DiscordInteractionResponseBuilder().WithContent("No tasks!"));
-      return;
-    }
-
-    await ctx.DeferAsync();
-    await ctx.EditResponseAsync(new DiscordWebhookBuilder()
-      .AddComponents(await GetDropdownListAsync(ctx.Guild.Id.ToString(), "Select a task to delete (no confirmation)", "delete")));
-  }
-
   internal static async Task<DiscordSelectComponent> GetDropdownListAsync(string guildId, string placeholder, string id)
   {
     List<Item> items = await _itemsController.Index();
