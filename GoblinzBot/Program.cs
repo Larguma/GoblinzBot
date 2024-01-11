@@ -88,7 +88,7 @@ internal class Program
     {
       StringPrefixes = new[] { "•", "!" }
     });
-    var slashCommandsConfig = Client.UseSlashCommands();
+        SlashCommandsExtension slashCommandsConfig = Client.UseSlashCommands();
 
     //Prefix Based Commands
     Commands.RegisterCommands<PrefixCommandsModule>();
@@ -121,13 +121,13 @@ internal class Program
 
   private static async Task UserJoinHandler(DiscordClient s, GuildMemberAddEventArgs e)
   {
-    var defaultChannel = e.Guild.GetDefaultChannel();
+        DiscordChannel defaultChannel = e.Guild.GetDefaultChannel();
 
-    var welcomeEmbed = new DiscordEmbedBuilder()
+        DiscordEmbedBuilder welcomeEmbed = new()
     {
       Color = DiscordColor.Gold,
       Title = $"Welcome {e.Member.Username} to the server",
-      Description = "Hope you enjoy your stay, please read the rules"
+      Description = "Bli bla blo"
     };
 
     await defaultChannel.SendMessageAsync(embed: welcomeEmbed);
@@ -248,19 +248,33 @@ internal class Program
       ObjectId id = item.Id;
       string end = item.End.ToString("yyyy-MM-dd", CultureInfo.CreateSpecificCulture("fr-CH"));
 
+      // Create the options for the user to pick
+      List<DiscordSelectComponentOption> colorOptions =
+      [
+        new("Firefly", "0"),
+        new("Orange", "1"),
+        new("Marble", "2"),
+        new("Indigo", "3")
+      ];
+
+      // Make the dropdown
+      DiscordSelectComponent colorDropdown = new ("colorDropdown", null, colorOptions);
+
       DiscordInteractionResponseBuilder modal = ModalBuilder.Create("modal_edit_task")
         .WithTitle("Edit a task")
         .AddComponents(new TextInputComponent("Course", "lesson", item.Lesson, item.Lesson))
         .AddComponents(new TextInputComponent("Name", "title", item.Title, item.Title))
         .AddComponents(new TextInputComponent("Date", "end", "yyyy-MM-dd", end))
-        .AddComponents(new TextInputComponent("Is Exam", "isExam", item.IsExam.ToString(), item.IsExam.ToString()));
+        .AddComponents(new TextInputComponent("Is Exam", "isExam", item.IsExam.ToString(), item.IsExam.ToString()))
+        .AddComponents(colorDropdown);
       await e.Interaction.CreateResponseAsync(InteractionResponseType.Modal, modal);
 
-      var response = await s.GetInteractivity().WaitForModalAsync(">modal_edit_task");
+      InteractivityResult<ModalSubmitEventArgs> response = await s.GetInteractivity().WaitForModalAsync(">modal_edit_task");
       item.Lesson = response.Result.Values["lesson"];
       item.Title = response.Result.Values["title"];
       item.End = DateTime.Parse(response.Result.Values["end"]);
       item.IsExam = bool.Parse(response.Result.Values["isExam"]);
+      item.Color = int.Parse(response.Result.Values["colorDropdown"]);
 
       await CalendarCommands.UpdateTask(item);
     }
@@ -273,14 +287,14 @@ internal class Program
     {
       string cooldownTimer = string.Empty;
 
-      foreach (var check in castedException.FailedChecks)
+      foreach (CheckBaseAttribute check in castedException.FailedChecks)
       {
-        var cooldown = (CooldownAttribute)check; //The cooldown that has triggered this method
+        CooldownAttribute cooldown = (CooldownAttribute)check; //The cooldown that has triggered this method
         TimeSpan timeLeft = cooldown.GetRemainingCooldown(e.Context); //Getting the remaining time on this cooldown
         cooldownTimer = timeLeft.ToString(@"hh\:mm\:ss");
       }
 
-      var cooldownMessage = new DiscordEmbedBuilder()
+        DiscordEmbedBuilder cooldownMessage = new()
       {
         Title = "Wait for the Cooldown to End",
         Description = "Remaining Time: " + cooldownTimer,

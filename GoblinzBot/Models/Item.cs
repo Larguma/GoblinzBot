@@ -17,4 +17,6 @@ public class Item
     public bool IsExam { get; set; } = false;
 
     public string GuildId { get; set; } = string.Empty;
+
+    public int Color { get; set; } = 1;
 }

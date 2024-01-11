@@ -28,12 +28,21 @@ public class CalendarCommands : ApplicationCommandModule
     [ChoiceName("SysInfo")] SysInfo,
   }
 
+  public enum ColorList
+  {
+    [ChoiceName("Firefly dark blue")] Firefly,
+    [ChoiceName("Orange")] Orange,
+    [ChoiceName("Marble blue")] Marble,
+    [ChoiceName("Indigo")] Indigo
+  }
+
   [SlashCommand("add", "Add a task")]
   public async void Add(InteractionContext ctx,
     [Option("course", "The course")] CourseList course,
     [Option("name", "The name of the task")] string name,
     [Option("date", "The date of the task (yyyy-MM-dd)")] string date,
-    [Option("isExam", "Is it an exam?")] bool isExam = false)
+    [Option("isExam", "Is it an exam?")] bool isExam = false,
+    [Option("color", "Is it an exam?")] ColorList color = ColorList.Orange)
   {
     if (ctx.Guild == null)
     {
@@ -56,7 +65,8 @@ public class CalendarCommands : ApplicationCommandModule
       Title = name,
       End = DateTime.Parse(date),
       IsExam = isExam,
-      GuildId = ctx.Guild.Id.ToString()
+      GuildId = ctx.Guild.Id.ToString(),
+      Color = (int)color
     });
 
     await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Task added! {course} - {name} ({date})"));
@@ -150,11 +160,25 @@ public class CalendarCommands : ApplicationCommandModule
       if (x.GuildId == guildId)
       {
         sb.Append("- ");
-        if (x.IsExam)
-          sb.Append($"\u001b[0;41mEXAM ");
 
         if (x.End < DateTime.Now)
           sb.Append($"\u001b[0;30m");
+        else if (x.IsExam)
+          switch (x.Color)
+          {
+            case 0:
+              sb.Append($"\u001b[0;40mEXAM "); // Firefly
+              break;
+            case 1:
+              sb.Append($"\u001b[0;41mEXAM "); // Orange
+              break;
+            case 2:
+              sb.Append($"\u001b[0;42mEXAM "); // Marble
+              break;
+            case 3:
+              sb.Append($"\u001b[0;45mEXAM "); // Indigo
+              break;
+          }
 
         sb.AppendLine($"{x.Lesson} - {x.Title} ({end})\u001b[0;0m");
       }
@@ -171,12 +195,12 @@ public class CalendarCommands : ApplicationCommandModule
     // \u001b[0;35mPink\u001b[0;0m
     // \u001b[0;36mCyan\u001b[0;0m
     // \u001b[0;37mWhite\u001b[0;0m
-    // \u001b[0;40mFirefly dark blue background\u001b[0;0m
-    // \u001b[0;41mOrange background\u001b[0;0m
-    // \u001b[0;42mMarble blue background\u001b[0;0m
+    // \u001b[0;40mFirefly dark blue background\u001b[0;0m  x
+    // \u001b[0;41mOrange background\u001b[0;0m  x
+    // \u001b[0;42mMarble blue background\u001b[0;0m x
     // \u001b[0;43mGreyish turquoise background\u001b[0;0m
     // \u001b[0;44mGray background\u001b[0;0m
-    // \u001b[0;45mIndigo background\u001b[0;0m
+    // \u001b[0;45mIndigo background\u001b[0;0m  x
     // \u001b[0;46mLight gray background\u001b[0;0m
     // \u001b[0;47mWhite background\u001b[0;0m
   }
