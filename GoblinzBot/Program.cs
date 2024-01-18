@@ -148,13 +148,19 @@ internal class Program
 
     // Check if user is banned
     if (BannedUsers.Count > 0)
-      BannedUsers.ForEach(x =>
+      BannedUsers.ForEach(async x =>
       {
         if (x.Until < DateTime.Now)
           BannedUsers.Remove(x);
         if (x.UserId == e.Author.Id)
         {
-          e.Message.DeleteAsync();
+          await e.Message.DeleteAsync();
+          DiscordEmbed embed = new DiscordEmbedBuilder()
+            .WithTitle("You are dead to me")
+            .WithDescription($"You are dead until {x.Until}")
+            .WithColor(DiscordColor.Red);
+          DiscordMember discordMember = await e.Guild.GetMemberAsync(e.Author.Id);
+          await discordMember.SendMessageAsync(embed);
           return;
         }
       });
@@ -265,15 +271,14 @@ internal class Program
       ];
 
       // Make the dropdown
-      DiscordSelectComponent colorDropdown = new ("colorDropdown", null, colorOptions);
+      DiscordSelectComponent colorDropdown = new("colorDropdown", null, colorOptions);
 
       DiscordInteractionResponseBuilder modal = ModalBuilder.Create("modal_edit_task")
         .WithTitle("Edit a task")
         .AddComponents(new TextInputComponent("Course", "lesson", item.Lesson, item.Lesson))
         .AddComponents(new TextInputComponent("Name", "title", item.Title, item.Title))
         .AddComponents(new TextInputComponent("Date", "end", "yyyy-MM-dd", end))
-        .AddComponents(new TextInputComponent("Is Exam", "isExam", item.IsExam.ToString(), item.IsExam.ToString()))
-        .AddComponents(colorDropdown);
+        .AddComponents(new TextInputComponent("Is Exam", "isExam", item.IsExam.ToString(), item.IsExam.ToString()));
       await e.Interaction.CreateResponseAsync(InteractionResponseType.Modal, modal);
 
       InteractivityResult<ModalSubmitEventArgs> response = await s.GetInteractivity().WaitForModalAsync(">modal_edit_task");
@@ -281,7 +286,7 @@ internal class Program
       item.Title = response.Result.Values["title"];
       item.End = DateTime.Parse(response.Result.Values["end"]);
       item.IsExam = bool.Parse(response.Result.Values["isExam"]);
-      item.Color = int.Parse(response.Result.Values["colorDropdown"]);
+      // item.Color = int.Parse(response.Result.Values["colorDropdown"]);
 
       await CalendarCommands.UpdateTask(item);
     }

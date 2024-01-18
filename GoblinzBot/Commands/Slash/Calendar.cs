@@ -42,7 +42,7 @@ public class CalendarCommands : ApplicationCommandModule
     [Option("name", "The name of the task")] string name,
     [Option("date", "The date of the task (yyyy-MM-dd)")] string date,
     [Option("isExam", "Is it an exam?")] bool isExam = false,
-    [Option("color", "Is it an exam?")] ColorList color = ColorList.Orange)
+    [Option("color", "Custom color for exam")] ColorList color = ColorList.Orange)
   {
     if (ctx.Guild == null)
     {
