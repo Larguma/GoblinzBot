@@ -261,24 +261,13 @@ internal class Program
       ObjectId id = item.Id;
       string end = item.End.ToString("yyyy-MM-dd", CultureInfo.CreateSpecificCulture("fr-CH"));
 
-      // Create the options for the user to pick
-      List<DiscordSelectComponentOption> colorOptions =
-      [
-        new("Firefly", "0"),
-        new("Orange", "1"),
-        new("Marble", "2"),
-        new("Indigo", "3")
-      ];
-
-      // Make the dropdown
-      DiscordSelectComponent colorDropdown = new("colorDropdown", null, colorOptions);
-
       DiscordInteractionResponseBuilder modal = ModalBuilder.Create("modal_edit_task")
         .WithTitle("Edit a task")
         .AddComponents(new TextInputComponent("Course", "lesson", item.Lesson, item.Lesson))
         .AddComponents(new TextInputComponent("Name", "title", item.Title, item.Title))
         .AddComponents(new TextInputComponent("Date", "end", "yyyy-MM-dd", end))
-        .AddComponents(new TextInputComponent("Is Exam", "isExam", item.IsExam.ToString(), item.IsExam.ToString()));
+        .AddComponents(new TextInputComponent("Is Exam", "isExam", item.IsExam.ToString(), item.IsExam.ToString()))
+        .AddComponents(new TextInputComponent("Backgroung color", "colorOption", "Firefly (0), Orange (1), Marble (2) or Indigo (3)", item.Color.ToString()));
       await e.Interaction.CreateResponseAsync(InteractionResponseType.Modal, modal);
 
       InteractivityResult<ModalSubmitEventArgs> response = await s.GetInteractivity().WaitForModalAsync(">modal_edit_task");
@@ -286,7 +275,7 @@ internal class Program
       item.Title = response.Result.Values["title"];
       item.End = DateTime.Parse(response.Result.Values["end"]);
       item.IsExam = bool.Parse(response.Result.Values["isExam"]);
-      // item.Color = int.Parse(response.Result.Values["colorDropdown"]);
+      item.Color = int.Parse(response.Result.Values["colorOption"]);
 
       await CalendarCommands.UpdateTask(item);
     }
