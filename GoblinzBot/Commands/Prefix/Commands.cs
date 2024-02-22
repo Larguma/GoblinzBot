@@ -96,7 +96,7 @@ public class PrefixCommandsModule : BaseCommandModule
   [Description("Print the IL timetable")]
   public async Task ILTimetable(CommandContext ctx) {
     await ctx.Message.DeleteAsync();
-    await ctx.RespondAsync("https://i.ibb.co/Ws0ZxFy/image.png");
+    await ctx.RespondAsync("https://i.ibb.co/5MRqcdP/image.png");
   }
 
   private async Task DeleteMessageAsync(CommandContext ctx)
