@@ -12,20 +12,21 @@ public class CalendarCommands : ApplicationCommandModule
   public enum CourseList
   {
     [ChoiceName("Admin")] Admin,
-    [ChoiceName("Ado")] Ado,
-    [ChoiceName("Ado (A)")] Ado_A,
-    [ChoiceName("Ado (B)")] Ado_B,
     [ChoiceName("Algo")] Algo,
     [ChoiceName("Concurp")] Concurp,
-    [ChoiceName("Concurp (A)")] Concurp_A,
-    [ChoiceName("Concurp (B)")] Concurp_B,
-    [ChoiceName("DevOps")] DevOps,
-    [ChoiceName("Maths")] Maths,
-    [ChoiceName("Mobile")] Mobile,
+    [ChoiceName("Cpp")] Cpp,
+    [ChoiceName("Embarqué")] Embarque,
+    [ChoiceName("TP Embarqué")] Tp_Embarque,
+    [ChoiceName("Génie logiciel")] Gl,
+    [ChoiceName("TP GL (A)")] Tp_Gl_A,
+    [ChoiceName("TP GL (B)")] Tp_Gl_B,
+    [ChoiceName("Maths Bapst")] Maths_B,
+    [ChoiceName("Maths Richard")] Maths_R,
+    [ChoiceName("PS4")] Ps4,
     [ChoiceName("Physique")] Physique,
-    [ChoiceName("Projet")] Projet,
-    [ChoiceName("Stats")] Stats,
-    [ChoiceName("SysInfo")] SysInfo,
+    [ChoiceName("SQL")] Sql,
+    [ChoiceName("TP SQL (A)")] Tp_Sql_A,
+    [ChoiceName("TP SQL (B)")] Tp_Sql_B,
   }
 
   public enum ColorList
