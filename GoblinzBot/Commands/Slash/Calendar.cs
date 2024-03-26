@@ -52,7 +52,7 @@ public class CalendarCommands : ApplicationCommandModule
       return;
     }
 
-    await ctx.DeferAsync();
+    await ctx.DeferAsync(ephemeral: true);
 
     if (!DateTime.TryParse(date, out DateTime _))
     {
