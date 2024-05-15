@@ -88,7 +88,7 @@ internal class Program
     {
       StringPrefixes = new[] { "•", "!" }
     });
-        SlashCommandsExtension slashCommandsConfig = Client.UseSlashCommands();
+    SlashCommandsExtension slashCommandsConfig = Client.UseSlashCommands();
 
     //Prefix Based Commands
     Commands.RegisterCommands<PrefixCommandsModule>();
@@ -121,9 +121,9 @@ internal class Program
 
   private static async Task UserJoinHandler(DiscordClient s, GuildMemberAddEventArgs e)
   {
-        DiscordChannel defaultChannel = e.Guild.GetDefaultChannel();
+    DiscordChannel defaultChannel = e.Guild.GetDefaultChannel();
 
-        DiscordEmbedBuilder welcomeEmbed = new()
+    DiscordEmbedBuilder welcomeEmbed = new()
     {
       Color = DiscordColor.Gold,
       Title = $"Welcome {e.Member.Username} to the server",
@@ -157,7 +157,7 @@ internal class Program
           await e.Message.DeleteAsync();
           DiscordEmbed embed = new DiscordEmbedBuilder()
             .WithTitle("You are dead to me")
-            .WithDescription($"You are dead until {x.Until}")
+            .WithDescription($"You are still dead for {x.Until.Subtract(DateTime.Now).TotalMinutes} minutes")
             .WithColor(DiscordColor.Red);
           DiscordMember discordMember = await e.Guild.GetMemberAsync(e.Author.Id);
           await discordMember.SendMessageAsync(embed);
@@ -174,25 +174,25 @@ internal class Program
       if (DiscordSettings.Lists.ItsJoever.Contains(msg) && Random.Next(0, 101) >= 75)
         await e.Message.RespondAsync("https://i.kym-cdn.com/photos/images/newsfeed/002/360/758/f0b.jpg");
 
-      if (msg.ToLower() == "java")
+      if (msg.Equals("java", StringComparison.CurrentCultureIgnoreCase))
         await e.Message.RespondAsync(DiscordSettings.Lists.JavaWord[Random.Next(DiscordSettings.Lists.JavaWord.Count)]);
     };
 
     // Check full message
-    if (DiscordSettings.Lists.RockAndStone.Any(rock => message.Contains(rock.ToLower())))
+    if (DiscordSettings.Lists.RockAndStone.Any(rock => message.Contains(rock, StringComparison.CurrentCultureIgnoreCase)))
       await e.Message.RespondAsync(DiscordSettings.Lists.RockAndStone[Random.Next(DiscordSettings.Lists.RockAndStone.Count)]);
 
     if (Random.Next(0, 101) == 100)
       await e.Message.CreateReactionAsync(DiscordEmoji.FromName(s, ":beers:"));
 
     // Good/Bad bot
-    if (message.ToLower() == "good bot")
+    if (message.Equals("good bot", StringComparison.CurrentCultureIgnoreCase))
       await e.Message.RespondAsync(DiscordSettings.Lists.GoodBot[Random.Next(DiscordSettings.Lists.GoodBot.Count)]);
-    if (message.ToLower() == "bad bot")
+    if (message.Equals("bad bot", StringComparison.CurrentCultureIgnoreCase))
       await e.Message.RespondAsync(DiscordSettings.Lists.BadBot[Random.Next(DiscordSettings.Lists.BadBot.Count)]);
 
     // APÉROOOOOO
-    if (message.ToLower().Contains("apero") || message.ToLower().Contains("apéro"))
+    if (message.Contains("apero", StringComparison.CurrentCultureIgnoreCase) || message.Contains("apéro", StringComparison.CurrentCultureIgnoreCase))
       await e.Message.RespondAsync("APÉROOOO!!");
 
     // Mention with openai
@@ -295,7 +295,7 @@ internal class Program
         cooldownTimer = timeLeft.ToString(@"hh\:mm\:ss");
       }
 
-        DiscordEmbedBuilder cooldownMessage = new()
+      DiscordEmbedBuilder cooldownMessage = new()
       {
         Title = "Wait for the Cooldown to End",
         Description = "Remaining Time: " + cooldownTimer,
