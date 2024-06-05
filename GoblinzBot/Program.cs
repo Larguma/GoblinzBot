@@ -86,7 +86,7 @@ internal class Program
 
     CommandsNextExtension Commands = Client.UseCommandsNext(new CommandsNextConfiguration()
     {
-      StringPrefixes = new[] { "•", "!" }
+      StringPrefixes = ["•", "!"]
     });
     SlashCommandsExtension slashCommandsConfig = Client.UseSlashCommands();
 
@@ -279,6 +279,22 @@ internal class Program
 
       await CalendarCommands.UpdateTask(item);
     }
+
+    if (e.Id == "btn_surrender_yes")
+    {
+      await e.Interaction.CreateResponseAsync(InteractionResponseType.UpdateMessage,
+        new DiscordInteractionResponseBuilder()
+        .AddComponents(GetSurrenderButtonComponent())
+        .WithContent(FunCommands.GetFormatedSurrender("yes", e.Message.Content).ToString()));
+    }
+
+    if (e.Id == "btn_surrender_no")
+    {
+      await e.Interaction.CreateResponseAsync(InteractionResponseType.UpdateMessage,
+        new DiscordInteractionResponseBuilder()
+        .AddComponents(GetSurrenderButtonComponent())
+        .WithContent(FunCommands.GetFormatedSurrender("no", e.Message.Content).ToString()));
+    }
   }
 
   private static async Task OnCommandError(CommandsNextExtension s, CommandErrorEventArgs e)
@@ -314,6 +330,15 @@ internal class Program
       new (ButtonStyle.Secondary, "btn_edit_task", "Edit a task", false, new DiscordComponentEmoji("📝")),
       new (ButtonStyle.Danger, "btn_delete_obsolete", "Delete old tasks", false, new DiscordComponentEmoji("🗑️")),
       new (ButtonStyle.Danger, "btn_delete_task", "Delete a task", false, new DiscordComponentEmoji("✖️")),
+    ];
+  }
+
+  internal static DiscordButtonComponent[] GetSurrenderButtonComponent()
+  {
+    return
+    [
+      new (ButtonStyle.Success, "btn_surrender_yes", "Yes"),
+      new (ButtonStyle.Danger, "btn_surrender_no", "No")
     ];
   }
 }

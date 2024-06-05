@@ -9,7 +9,7 @@ public class HelpCommands : ApplicationCommandModule
   private HttpClient http = new();
 
   [SlashCommand("help", "Get some help")]
-  public async void Help(InteractionContext ctx)
+  public static async void Help(InteractionContext ctx)
   {
     DiscordEmbedBuilder embed = new()
     {
@@ -33,13 +33,14 @@ public class HelpCommands : ApplicationCommandModule
     embed.AddField("/list", "Pour afficher toutes les tâches du calendrier de la classe comme un recensement des butins après une bataille, voici une commande `/list` qui devrait te plaire.\nGroumpf ! Ça va te donner une liste bien rangée de toutes les tâches à accomplir, comme les trophées d'un chasseur de dragons ! Grrr, n'oublie pas de vérifier ça régulièrement, sinon ça pourrait être pire que de se retrouver nez à nez avec un basilic ! Groumpf !");
 
     embed.AddField("/weather", "Ah, tu veux savoir si le soleil brille ou si les nuages préparent une attaque ! Voici une commande `/weather` pour ça :\n```/weather location:\"Gobelinvillia\"```\nGroumpf ! Change \"Gobelinvillia\" par le nom de la ville que tu veux, et cette commande te donnera un rapport météo plus précis qu'un oracle gobelin ! Grrr, c'est toujours utile de savoir si tu auras besoin d'un parapluie ou d'une armure anti-orage ! Groumpf !");
+    embed.AddField("/ff", "Ah, toi, fatigué de la bataille?! Grogne\nUtilise la commande `/ff` pour lancer un vote de reddition! Grrr! Toi et ton équipe, décider de fuir ou de combattre jusqu'à la mort! Groumpf! Sois rapide, sinon gobelins te mangeront! Grrr!");
 
     await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
       new DiscordInteractionResponseBuilder().AddEmbed(embed));
   }
 
   [SlashCommand("feedback", "Send a feedback to the dev")]
-  public async void Feedback(InteractionContext ctx,
+  public static async void Feedback(InteractionContext ctx,
     [Option("message", "The message you want to send")] string fb)
   {
     if (ctx.Guild == null)
@@ -97,7 +98,7 @@ public class HelpCommands : ApplicationCommandModule
   }
 
   [SlashCommand("poll", "Create a poll")]
-  public async void Poll(InteractionContext ctx,
+  public static async void Poll(InteractionContext ctx,
     [Option("question", "What do you want to ask")] string question,
     [Option("options", "The options separated by ';' (max 10)")] string option)
   {

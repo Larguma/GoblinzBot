@@ -38,7 +38,7 @@ public class CalendarCommands : ApplicationCommandModule
   }
 
   [SlashCommand("add", "Add a task")]
-  public async void Add(InteractionContext ctx,
+  public static async void Add(InteractionContext ctx,
     [Option("course", "The course")] CourseList course,
     [Option("name", "The name of the task")] string name,
     [Option("date", "The date of the task (yyyy-MM-dd)")] string date,
@@ -74,7 +74,7 @@ public class CalendarCommands : ApplicationCommandModule
   }
 
   [SlashCommand("list", "List all tasks")]
-  public async void List(InteractionContext ctx)
+  public static async void List(InteractionContext ctx)
   {
     if (ctx.Guild == null)
     {
