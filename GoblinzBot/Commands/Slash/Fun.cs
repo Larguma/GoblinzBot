@@ -2,6 +2,7 @@ using System.Text;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using Serilog;
 
 public class FunCommands : ApplicationCommandModule
 {
@@ -26,35 +27,48 @@ public class FunCommands : ApplicationCommandModule
   }
 
   [SlashCommand("ff", "Surrender")]
-  public static async void Surrender(InteractionContext ctx)
+  public static async void Surrender(InteractionContext ctx,
+    [Option("title", "The title")] string title = "Surrender")
   {
     await ctx.DeferAsync();
 
-    StringBuilder sb = GetFormatedSurrender("init");
+    StringBuilder sb = GetFormatedSurrender("init", title: title);
 
     await ctx.EditResponseAsync(new DiscordWebhookBuilder()
       .AddComponents(Program.GetSurrenderButtonComponent())
       .WithContent(sb.ToString()));
   }
 
-  internal static StringBuilder GetFormatedSurrender(string choice, string oldMessage = "")
+  internal static StringBuilder GetFormatedSurrender(string choice, string oldMessage = "", string title = "", string username = "")
   {
     StringBuilder sb = new();
 
     sb.AppendLine(oldMessage);
 
+    Log.Logger.Information($"oldMessage: {oldMessage} - title: {title} - username: {username} - choice: {choice}");
+
+    if (oldMessage != "" && oldMessage.Contains(username, StringComparison.CurrentCultureIgnoreCase))
+    {
+      return sb;
+    }
+
+    Log.Logger.Information($"oldMessage: {oldMessage} - title: {title} - username: {username} - choice: {choice}");
+
     if (choice == "init")
     {
-      sb.AppendLine("      Surrender      ");
+      sb.AppendLine(title);
       sb.AppendLine("―――――――――――――――――――――");
+      Log.Logger.Information("init");
     }
     else if (choice == "yes")
     {
-      sb.Append('✅');
+      sb.Append($"✅ ({username})");
+      Log.Logger.Information($"yes - {username} - {sb}");
     }
     else if (choice == "no")
     {
-      sb.Append('❌');
+      sb.Append($"❌ ({username})");
+      Log.Logger.Information($"no - {username} - {sb}");
     }
 
     return sb;
