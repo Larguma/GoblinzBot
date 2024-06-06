@@ -285,7 +285,7 @@ internal class Program
       await e.Interaction.CreateResponseAsync(InteractionResponseType.UpdateMessage,
         new DiscordInteractionResponseBuilder()
         .AddComponents(GetSurrenderButtonComponent())
-        .WithContent(FunCommands.GetFormatedSurrender("yes", e.Message.Content).ToString()));
+        .WithContent(FunCommands.GetFormatedSurrender("yes", e.Message.Content, e.User.Username).ToString()));
     }
 
     if (e.Id == "btn_surrender_no")
