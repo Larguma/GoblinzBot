@@ -184,6 +184,10 @@ internal class Program
 
     if (Random.Next(0, 101) == 100)
       await e.Message.CreateReactionAsync(DiscordEmoji.FromName(s, ":beers:"));
+    else if (Random.Next(0, 101) == 100)
+      await e.Message.CreateReactionAsync(DiscordEmoji.FromName(s, ":cool:"));
+    else if (Random.Next(0, 101) == 100)
+      await e.Message.RespondAsync("vas crever <3");
 
     // Good/Bad bot
     if (message.Equals("good bot", StringComparison.CurrentCultureIgnoreCase))
