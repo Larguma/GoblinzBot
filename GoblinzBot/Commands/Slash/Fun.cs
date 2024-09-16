@@ -28,7 +28,7 @@ public class FunCommands : ApplicationCommandModule
 
   [SlashCommand("ff", "Surrender")]
   public static async void Surrender(InteractionContext ctx,
-    [Option("title", "The title")] string title = "Surrender")
+    [Option("title", "The title")] string title = "Surrender https://cdn.discordapp.com/attachments/1158728447510708234/1285162697926901781/exit_form_heia.pdf")
   {
     await ctx.DeferAsync();
 

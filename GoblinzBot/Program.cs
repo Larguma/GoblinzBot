@@ -157,7 +157,7 @@ internal class Program
           await e.Message.DeleteAsync();
           DiscordEmbed embed = new DiscordEmbedBuilder()
             .WithTitle("You are dead to me")
-            .WithDescription($"You are still dead for {x.Until.Subtract(DateTime.Now).TotalMinutes} minutes")
+            .WithDescription($"You are still dead for {x.Until.Subtract(DateTime.Now).TotalMinutes:0.##} minutes")
             .WithColor(DiscordColor.Red);
           DiscordMember discordMember = await e.Guild.GetMemberAsync(e.Author.Id);
           await discordMember.SendMessageAsync(embed);
@@ -186,8 +186,6 @@ internal class Program
       await e.Message.CreateReactionAsync(DiscordEmoji.FromName(s, ":beers:"));
     else if (Random.Next(0, 101) == 100)
       await e.Message.CreateReactionAsync(DiscordEmoji.FromName(s, ":cool:"));
-    else if (Random.Next(0, 101) == 100)
-      await e.Message.RespondAsync("vas crever <3");
 
     // Good/Bad bot
     if (message.Equals("good bot", StringComparison.CurrentCultureIgnoreCase))
