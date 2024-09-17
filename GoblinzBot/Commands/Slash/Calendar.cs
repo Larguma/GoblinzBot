@@ -75,7 +75,8 @@ public class CalendarCommands : ApplicationCommandModule
   }
 
   [SlashCommand("list", "List all tasks")]
-  public static async void List(InteractionContext ctx)
+  public static async void List(InteractionContext ctx,
+  [Option("show_all", "Show all tasks ?")] bool showAll = false)
   {
     if (ctx.Guild == null)
     {
@@ -86,7 +87,7 @@ public class CalendarCommands : ApplicationCommandModule
 
     await ctx.DeferAsync();
 
-    StringBuilder sb = await GetFormatedListAsync(ctx.Guild.Id.ToString());
+    StringBuilder sb = await GetFormatedListAsync(ctx.Guild.Id.ToString(), showAll);
 
     await ctx.EditResponseAsync(new DiscordWebhookBuilder()
     .AddComponents(Program.GetListButtonComponent())
@@ -119,7 +120,7 @@ public class CalendarCommands : ApplicationCommandModule
     return new DiscordSelectComponent($"dropdown_tasks_{id}", placeholder, options);
   }
 
-  internal static async Task<StringBuilder> GetFormatedListAsync(string guildId)
+  internal static async Task<StringBuilder> GetFormatedListAsync(string guildId, bool showAll = false)
   {
     // List cleanup
     List<Item> items = await _itemsController.Index();
@@ -135,7 +136,7 @@ public class CalendarCommands : ApplicationCommandModule
     sb.AppendLine("\u001b[1;37mTasks:\u001b[0;0m");
     items.ForEach(x =>
     {
-      if (x.GuildId == guildId && x.End <= DateTime.Now.AddMonths(1))
+      if (x.GuildId == guildId && (showAll || x.End <= DateTime.Now.AddMonths(1)))
       {
         string end = x.End.ToString("dddd dd/MM", CultureInfo.CreateSpecificCulture("fr-CH"));
         sb.Append("- ");
