@@ -135,9 +135,9 @@ public class CalendarCommands : ApplicationCommandModule
     sb.AppendLine("\u001b[1;37mTasks:\u001b[0;0m");
     items.ForEach(x =>
     {
-      string end = x.End.ToString("dddd dd/MM", CultureInfo.CreateSpecificCulture("fr-CH"));
-      if (x.GuildId == guildId)
+      if (x.GuildId == guildId && x.End <= DateTime.Now.AddMonths(1))
       {
+        string end = x.End.ToString("dddd dd/MM", CultureInfo.CreateSpecificCulture("fr-CH"));
         sb.Append("- ");
 
         if (x.End < DateTime.Now)
