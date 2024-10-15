@@ -134,11 +134,18 @@ public class CalendarCommands : ApplicationCommandModule
 
     sb.AppendLine("```ansi");
     sb.AppendLine("\u001b[1;37mTasks:\u001b[0;0m");
+    Item? previous = null;
     items.ForEach(x =>
     {
       if (x.GuildId == guildId && (showAll || x.End <= DateTime.Now.AddMonths(1)))
       {
         string end = x.End.ToString("dddd dd/MM", CultureInfo.CreateSpecificCulture("fr-CH"));
+
+        // Add a separator if not same week
+        if (previous != null && !DatesAreInTheSameWeek(previous.End, x.End))
+          sb.AppendLine();
+        previous = x;
+
         sb.Append("- ");
 
         if (x.End < DateTime.Now)
@@ -183,6 +190,15 @@ public class CalendarCommands : ApplicationCommandModule
     // \u001b[0;45mIndigo background\u001b[0;0m  x
     // \u001b[0;46mLight gray background\u001b[0;0m
     // \u001b[0;47mWhite background\u001b[0;0m
+  }
+
+  private static bool DatesAreInTheSameWeek(DateTime date1, DateTime date2)
+  {
+    var cal = DateTimeFormatInfo.CurrentInfo.Calendar;
+    var d1 = date1.Date.AddDays(-1 * (int)cal.GetDayOfWeek(date1));
+    var d2 = date2.Date.AddDays(-1 * (int)cal.GetDayOfWeek(date2));
+
+    return d1.Date == d2.Date;
   }
 
   internal static async Task DeleteObsolete()
