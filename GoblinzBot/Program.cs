@@ -238,6 +238,13 @@ internal class Program
         .WithContent(CalendarCommands.GetFormatedListAsync(e.Guild.Id.ToString()).Result.ToString()));
     }
 
+    if (e.Id == "btn_refresh_list_show_all")
+    {
+      await e.Interaction.CreateResponseAsync(InteractionResponseType.UpdateMessage, new DiscordInteractionResponseBuilder()
+        .AddComponents(GetListButtonComponent())
+        .WithContent(CalendarCommands.GetFormatedListAsync(e.Guild.Id.ToString(), true).Result.ToString()));
+    }
+
     if (e.Id == "dropdown_tasks_delete")
     {
       await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
@@ -329,6 +336,7 @@ internal class Program
     return
     [
       new (ButtonStyle.Primary, "btn_refresh_list", "Refresh list", false, new DiscordComponentEmoji("🔄")),
+      new (ButtonStyle.Primary, "btn_refresh_list_show_all", "Refresh list (show all)", false, new DiscordComponentEmoji("🔄")),
       new (ButtonStyle.Secondary, "btn_edit_task", "Edit a task", false, new DiscordComponentEmoji("📝")),
       new (ButtonStyle.Danger, "btn_delete_obsolete", "Delete old tasks", false, new DiscordComponentEmoji("🗑️")),
       new (ButtonStyle.Danger, "btn_delete_task", "Delete a task", false, new DiscordComponentEmoji("✖️")),
