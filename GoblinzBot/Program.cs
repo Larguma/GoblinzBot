@@ -193,6 +193,10 @@ internal class Program
     if (message.Equals("bad bot", StringComparison.CurrentCultureIgnoreCase))
       await e.Message.RespondAsync(DiscordSettings.Lists.BadBot[Random.Next(DiscordSettings.Lists.BadBot.Count)]);
 
+    // Suicide
+    if (message.Contains("suicide", StringComparison.CurrentCultureIgnoreCase) || message.Contains("unalive", StringComparison.CurrentCultureIgnoreCase))
+      await e.Message.RespondAsync("027 321 21 21");
+
     // APÉROOOOOO
     if (message.Contains("apero", StringComparison.CurrentCultureIgnoreCase) || message.Contains("apéro", StringComparison.CurrentCultureIgnoreCase))
       await e.Message.RespondAsync("APÉROOOO!!");
