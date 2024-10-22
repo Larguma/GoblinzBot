@@ -220,14 +220,14 @@ internal class Program
     {
       await e.Interaction.CreateResponseAsync(InteractionResponseType.UpdateMessage, new DiscordInteractionResponseBuilder()
       .AddComponents(GetListButtonComponent())
-      .AddComponents(await CalendarCommands.GetDropdownListAsync(e.Guild.Id.ToString(), "Select a task to edit", "edit")));
+      .AddComponents(CalendarCommands.GetDropdownListAsync(e.Guild.Id.ToString(), "Select a task to edit", "edit").Result));
     }
 
     if (e.Id == "btn_delete_task")
     {
       await e.Interaction.CreateResponseAsync(InteractionResponseType.UpdateMessage, new DiscordInteractionResponseBuilder()
       .AddComponents(GetListButtonComponent())
-      .AddComponents(await CalendarCommands.GetDropdownListAsync(e.Guild.Id.ToString(), "Select a task to delete (no confirmation)", "delete")));
+      .AddComponents(CalendarCommands.GetDropdownListAsync(e.Guild.Id.ToString(), "Select a task to delete (no confirmation)", "delete").Result));
     }
 
     if (e.Id == "btn_delete_obsolete" ||
