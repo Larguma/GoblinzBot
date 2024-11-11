@@ -205,8 +205,8 @@ internal class Program
     if (message.Contains(s.CurrentUser.Mention))
     {
       DiscordMessage discordMessage = await e.Message.RespondAsync("Goblinz is thinking...");
+      message = message.Replace(s.CurrentUser.Mention, "Goblinz");
       Console.WriteLine($"OPENAI: {message} - {DateTime.Now} | {e.Author.Username} - {e.Channel.Name}");
-      message = message.Replace(s.CurrentUser.Mention, "");
       string response = await Openai.GetResponseAsync(message) ?? string.Empty;
       Console.WriteLine($"OPENAI: {response} - {DateTime.Now}");
       await discordMessage.ModifyAsync(response);

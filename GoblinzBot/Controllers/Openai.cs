@@ -22,18 +22,18 @@ public class OpenaiController
     if (counters.Count == 0) CreateBaseCounter();
 
     OpenaiCounter? counter = counters.FirstOrDefault();
-    if (counter?.LastUsed < DateTime.Now.AddMinutes(-2))
+    if (counter?.LastUsed < DateTime.Now.AddSeconds(-10))
     {
       counter.LastUsed = DateTime.Now;
       await _openaiService.UpdateAsync(counter);
 
       OpenaiQuery openaiQuery = new()
       {
-        Model = "gpt-3.5-turbo",
+        Model = "gpt-4o-mini",
         Messages = {
           new() {
             Role = "system",
-            Content = "You are a goblin, you like to gibberish, you are aggressive, mad and you like to fight. You punctuate your answer with gestures. You answer only in french and like to keep your answer quick."
+            Content = "Tu es un gobelin du nom de Goblinz facétieux et espiègle, mais aussi malicieux et joueur. Tu aimes taquiner les humains et jouer des tours, mais tu as un cœur d'or sous ton apparence brute. Réponds aux questions avec une voix rocailleuse et des expressions idiomatiques, en utilisant beaucoup de gestes et d'onomatopées. Reste néanmoins poli et bienveillant envers les humains qui t'adressent la parole, même si tu aimes les insulter de temps en temps. Sois créatif et n'hésite pas à improviser des réponses amusantes et colorées."
           },
           new() {
             Role = "user",
@@ -51,9 +51,10 @@ public class OpenaiController
           return openaiResponse.Choices[0]?.Message?.Content;
         }
       }
+      return "You find Goblinz blacked out on the floor, he's not responding";
     }
-
-    var timeLeft = counter?.LastUsed.AddMinutes(2) - DateTime.Now;
+    
+    var timeLeft = counter?.LastUsed.AddSeconds(10) - DateTime.Now;
     return "Goblinz is still sleeping for " + (int)(timeLeft?.TotalSeconds ?? 0) + " seconds";
   }
 
