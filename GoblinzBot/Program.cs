@@ -158,7 +158,7 @@ internal class Program
           DiscordMember discordMember = await e.Guild.GetMemberAsync(e.Author.Id);
           DiscordEmbed embed = new DiscordEmbedBuilder()
             .WithTitle("Le Sort 'Ta-Geule-C'est-Magique' !")
-            .WithDescription($"*consulte son sablier rempli de paillettes* Hihihi ! {discordMember.DisplayName} doit encore faire ami-ami avec le silence pendant {x.Until.Subtract(DateTime.Now).TotalSeconds:0.##} secondes ! *danse la polka*")
+            .WithDescription($"*consulte son sablier rempli de paillettes* Hihihi ! {discordMember.DisplayName} doit encore faire ami-ami avec la mort pendant {x.Until.Subtract(DateTime.Now).TotalSeconds:0.##} secondes ! *danse la polka*")
             .WithColor(DiscordColor.Red);
           await e.Message.RespondAsync(embed);
           return;

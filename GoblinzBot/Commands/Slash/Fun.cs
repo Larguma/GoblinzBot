@@ -43,15 +43,15 @@ public class FunCommands : ApplicationCommandModule
         new DiscordInteractionResponseBuilder().WithContent("The kill list is empty!"));
       return;
     }
+    DiscordMember discordMember = await ctx.Guild.GetMemberAsync(user.Id);
 
-    string kill = kills[rdn.Next(kills.Count)].Replace("{user}", user.Username);
+    string kill = kills[rdn.Next(kills.Count)].Replace("{user}", discordMember.Mention);
     Program.BannedUsers.Add(new()
     {
       UserId = user.Id,
       Until = DateTime.Now.AddSeconds(30)
     });
 
-    DiscordMember discordMember = await ctx.Guild.GetMemberAsync(ctx.Member.Id);
 
     DiscordEmbedBuilder embed = new()
     {
@@ -59,8 +59,8 @@ public class FunCommands : ApplicationCommandModule
       Description = kill,
       Author = new()
       {
-        Name = discordMember.DisplayName,
-        IconUrl = user.AvatarUrl
+        Name = ctx.Member?.DisplayName,
+        IconUrl = ctx.Member?.AvatarUrl
       }
     };
 
