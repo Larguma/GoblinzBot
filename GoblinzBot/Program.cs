@@ -155,12 +155,12 @@ internal class Program
         if (x.UserId == e.Author.Id)
         {
           await e.Message.DeleteAsync();
-          DiscordEmbed embed = new DiscordEmbedBuilder()
-            .WithTitle("You are dead to me")
-            .WithDescription($"You are still dead for {x.Until.Subtract(DateTime.Now).TotalMinutes:0.##} minutes")
-            .WithColor(DiscordColor.Red);
           DiscordMember discordMember = await e.Guild.GetMemberAsync(e.Author.Id);
-          await discordMember.SendMessageAsync(embed);
+          DiscordEmbed embed = new DiscordEmbedBuilder()
+            .WithTitle("Le Sort 'Ta-Geule-C'est-Magique' !")
+            .WithDescription($"*consulte son sablier rempli de paillettes* Hihihi ! {discordMember.DisplayName} doit encore faire ami-ami avec le silence pendant {x.Until.Subtract(DateTime.Now).TotalSeconds:0.##} secondes ! *danse la polka*")
+            .WithColor(DiscordColor.Red);
+          await e.Message.RespondAsync(embed);
           return;
         }
       });

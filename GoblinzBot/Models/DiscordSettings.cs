@@ -30,4 +30,6 @@ public class Lists
     public List<string> Insult { get; set; } = [];
 
     public List<string> JavaWord { get; set; } = [];
+
+    public List<string> KillList { get; set; } = [];
 }

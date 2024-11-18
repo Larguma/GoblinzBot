@@ -26,6 +26,47 @@ public class FunCommands : ApplicationCommandModule
       new DiscordInteractionResponseBuilder().WithContent($"{user.Mention}{insult}").AddMentions([new UserMention(user)]));
   }
 
+  [SlashCommand("kill", "End someone's life")]
+  public async void Kill(InteractionContext ctx,
+    [Option("user", "The user you want to kill")] DiscordUser user)
+  {
+    if (ctx.Guild == null)
+    {
+      await ctx.CreateResponseAsync("This command can only be used in a server!");
+      return;
+    }
+
+    List<string>? kills = Program.DiscordSettings?.Lists?.KillList;
+    if (kills is null || kills.Count == 0)
+    {
+      await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
+        new DiscordInteractionResponseBuilder().WithContent("The kill list is empty!"));
+      return;
+    }
+
+    string kill = kills[rdn.Next(kills.Count)].Replace("{user}", user.Username);
+    Program.BannedUsers.Add(new()
+    {
+      UserId = user.Id,
+      Until = DateTime.Now.AddSeconds(30)
+    });
+
+    DiscordMember discordMember = await ctx.Guild.GetMemberAsync(ctx.Member.Id);
+
+    DiscordEmbedBuilder embed = new()
+    {
+      Color = DiscordColor.Red,
+      Description = kill,
+      Author = new()
+      {
+        Name = discordMember.DisplayName,
+        IconUrl = user.AvatarUrl
+      }
+    };
+
+    await ctx.CreateResponseAsync(embed);
+  }
+
   [SlashCommand("ff", "Surrender")]
   public static async void Surrender(InteractionContext ctx,
     [Option("title", "The title")] string title = "Surrender https://cdn.discordapp.com/attachments/1158728447510708234/1285162697926901781/exit_form_heia.pdf")
