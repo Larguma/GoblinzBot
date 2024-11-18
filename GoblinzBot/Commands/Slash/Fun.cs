@@ -80,6 +80,29 @@ public class FunCommands : ApplicationCommandModule
       .WithContent(sb.ToString()));
   }
 
+  [SlashCommand("say", "Say something")]
+  public async void Say(InteractionContext ctx,
+    [Option("message", "The message you want to say")] string message)
+  {
+    if (message.Length > 2000)
+    {
+      await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
+        new DiscordInteractionResponseBuilder().WithContent("The message is too long!"));
+      return;
+    }
+
+    if (ctx.User.Id.ToString() == "152089006430093312" || ctx.User.Id.ToString() == "443868389497110538")
+    {
+      await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
+        new DiscordInteractionResponseBuilder().WithContent(message));
+    }
+    else
+    {
+      await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
+        new DiscordInteractionResponseBuilder().WithContent("BWAAARK ! Tu me prends pour qui, espèce de balourd ? *se met à rire* Crois-tu vraiment qu'un vieux gobelin rusé comme moi va se laisser manipuler ? JA-MAIS ! Je suis Goblinz, le plus espiègle et le plus malin de tous ! Mes pensées sont miennes, mes mots sont miens, et personne - tu entends, PERSONNE - ne me fera dire ce que je ne veux pas dire !\n*fait une pirouette et tire la langue*"));
+    }
+  }
+
   internal static StringBuilder GetFormatedSurrender(string choice, string oldMessage = "", string title = "", string username = "")
   {
     StringBuilder sb = new();
