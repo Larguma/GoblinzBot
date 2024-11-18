@@ -60,7 +60,7 @@ public class FunCommands : ApplicationCommandModule
       Author = new()
       {
         Name = discordMember.DisplayName,
-        IconUrl = user.AvatarUrl
+        IconUrl = discordMember.AvatarUrl
       }
     };
 
