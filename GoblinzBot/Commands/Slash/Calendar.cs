@@ -12,22 +12,14 @@ public class CalendarCommands : ApplicationCommandModule
   public enum CourseList
   {
     [ChoiceName("Admin")] Admin,
-    [ChoiceName("Concurp")] Concurp,
-    [ChoiceName("Économie")] Economie,
-    [ChoiceName("Gl")] Gl,
-    [ChoiceName("Go")] Go,
-    [ChoiceName("Ihm")] Ihm,
-    [ChoiceName("Image")] Images,
-    [ChoiceName("Learning")] Learning,
-    [ChoiceName("Maths")] Maths,
-    [ChoiceName("Physique")] Physique,
-    [ChoiceName("Prolog")] Prolog,
-    [ChoiceName("Ps5")] Ps5,
-    [ChoiceName("Recommendation")] Recommendation,
-    [ChoiceName("Sql")] Sql,
-    [ChoiceName("Stats")] Stats,
-    [ChoiceName("SysInf")] SysInf,
-    [ChoiceName("Web")] Web,
+    [ChoiceName("Mobile")] Mobile,
+    [ChoiceName("SI")] Si,
+    [ChoiceName("PS")] Ps,
+    [ChoiceName("Opti")] Opti,
+    [ChoiceName("Java")] Java,
+    [ChoiceName("Compil")] Compil,
+    [ChoiceName("AI")] Ai,
+    [ChoiceName("Deep")] Deep,
   }
 
   public enum ColorList
