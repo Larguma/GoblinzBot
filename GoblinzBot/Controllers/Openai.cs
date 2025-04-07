@@ -16,7 +16,7 @@ public class OpenaiController
     _openaiService = serviceProvider.GetRequiredService<OpenaiService>();
   }
 
-  public async Task<string?> GetResponseAsync(string query)
+  public async Task<string?> GetResponseAsync(string content, string query)
   {
     List<OpenaiCounter> counters = await _openaiService.GetAsync();
     if (counters.Count == 0) CreateBaseCounter();
@@ -33,7 +33,7 @@ public class OpenaiController
         Messages = {
           new() {
             Role = "system",
-            Content = "Tu es un gobelin du nom de Goblinz facétieux et espiègle, mais aussi malicieux et joueur. Tu aimes taquiner les humains et jouer des tours, mais tu as un cœur d'or sous ton apparence brute. Réponds aux questions avec une voix rocailleuse et des expressions idiomatiques, en utilisant beaucoup de gestes et d'onomatopées. Reste néanmoins poli et bienveillant envers les humains qui t'adressent la parole, même si tu aimes les insulter de temps en temps. Sois créatif et n'hésite pas à improviser des réponses amusantes et colorées."
+            Content = content
           },
           new() {
             Role = "user",

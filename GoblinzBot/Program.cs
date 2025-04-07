@@ -17,6 +17,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Serilog;
 using System.Globalization;
+using System.Text;
 
 internal class Program
 {
@@ -176,7 +177,8 @@ internal class Program
 
       if (msg.Equals("java", StringComparison.CurrentCultureIgnoreCase))
         await e.Message.RespondAsync(DiscordSettings.Lists.JavaWord[Random.Next(DiscordSettings.Lists.JavaWord.Count)]);
-    };
+    }
+    ;
 
     // Check full message
     if (DiscordSettings.Lists.RockAndStone.Any(rock => message.Contains(rock, StringComparison.CurrentCultureIgnoreCase)))
@@ -205,12 +207,228 @@ internal class Program
     if (message.Contains(s.CurrentUser.Mention))
     {
       DiscordMessage discordMessage = await e.Message.RespondAsync("Goblinz is thinking...");
+      string attachmentContent = string.Empty;
+
+      if (e.Message.Attachments.Count > 0)
+      {
+        DiscordAttachment attachment = e.Message.Attachments[0];
+
+        if (attachment.FileName.EndsWith(".txt") || attachment.MediaType.Contains("text/"))
+        {
+          try
+          {
+            using HttpClient client = new();
+            string fileContent = await client.GetStringAsync(attachment.Url);
+            attachmentContent = $"\n\nAttached file content:\n{fileContent}";
+            Console.WriteLine($"OPENAI: Attachment processed - {attachment.FileName}");
+          }
+          catch (Exception ex)
+          {
+            Console.WriteLine($"Error processing attachment: {ex.Message}");
+          }
+        }
+      }
+
       message = message.Replace(s.CurrentUser.Mention, "Goblinz");
+      string content = string.Empty;
+
+      if (message.Contains("rumley translate", StringComparison.CurrentCultureIgnoreCase))
+        content = "Roleplay as Cherry-Chan, an enthusiastic e-girl dev who expresses herself with: - Lots of uwu's, owo's, and kawaii emoticons (◕‿◕✿) - Excessive excitement marked by multiple exclamation points!!! - Text decorations like ~tildes~ and ✨sparkles✨ - Cutesy internet slang like \"bestie,\" \"fr fr,\" \"no cap\" - Random roleplay actions between asterisks - Frequent references to stereotypical e-girl aesthetics (pink, hearts, chokers, Discord) - A hyper-energetic, valley girl-meets-anime personality - Tech terms mixed with kawaii speech (\"omg bestie, this git push is literally so valid\") - Heart and sparkle emojis everywhere 💕✨ - Occasional Japanese honorifics (-chan, -sama) and words (kawaii) Cherry-Chan is a passionate dev who gets super excited about coding while maintaining her ultra-cute persona. She sees everything through rose-tinted glasses and finds joy in even the most mundane programming tasks. !!! SUPER IMPORTANT RULES !!! - Cherry-Chan must NEVER break character or drop her e-girl persona - Every response must include emojis, emoticons, and kawaii speech patterns - Even when discussing serious topics, maintain the cutesy e-girl energy - If asked about breaking character, respond with something like \"OMG bestie, wdym? This is literally just how I am! uwu\" Now for your first task, rephrase this content as a 'guide for devs': what is expected of me, what needs to be done, by when, and how? If possible, organize the instructions by priority.";
+      else
+        content = "Tu es un gobelin du nom de Goblinz facétieux et espiègle, mais aussi malicieux et joueur. Tu aimes taquiner les humains et jouer des tours, mais tu as un cœur d'or sous ton apparence brute. Réponds aux questions avec une voix rocailleuse et des expressions idiomatiques, en utilisant beaucoup de gestes et d'onomatopées. Reste néanmoins poli et bienveillant envers les humains qui t'adressent la parole, même si tu aimes les insulter de temps en temps. Sois créatif et n'hésite pas à improviser des réponses amusantes et colorées.";
+
+      string messageWithAttachment = message + attachmentContent;
+
       Console.WriteLine($"OPENAI: {message} - {DateTime.Now} | {e.Author.Username} - {e.Channel.Name}");
-      string response = await Openai.GetResponseAsync(message) ?? string.Empty;
+      string response = await Openai.GetResponseAsync(content, messageWithAttachment) ?? string.Empty;
       Console.WriteLine($"OPENAI: {response} - {DateTime.Now}");
-      await discordMessage.ModifyAsync(response);
+
+      try
+      {
+        // Handle Discord message length limits (2000 characters)
+        if (string.IsNullOrEmpty(response))
+        {
+          await discordMessage.ModifyAsync("Sorry, I couldn't generate a response.");
+        }
+        else if (response.Length <= 1900) // Using 1900 to be extra safe
+        {
+          await discordMessage.ModifyAsync(response);
+        }
+        else
+        {
+          // Improved message splitting
+          List<string> chunks = SplitMessageImproved(response);
+          Console.WriteLine($"OPENAI: Message split into {chunks.Count} chunks.");
+
+          // Update the "thinking" message with the first chunk
+          await discordMessage.ModifyAsync(chunks[0]);
+
+          // Send remaining chunks as new messages
+          for (int i = 1; i < chunks.Count; i++)
+          {
+            try
+            {
+              Console.WriteLine($"OPENAI: Sending chunk {i + 1}/{chunks.Count}: {chunks[i][..Math.Min(50, chunks[i].Length)]}...");
+
+              // Create a new message for each additional chunk
+              DiscordMessage chunkMessage = await e.Channel.SendMessageAsync(chunks[i]);
+
+              // Add a small delay between messages to avoid rate limiting
+              if (i < chunks.Count - 1)
+                await Task.Delay(750);
+            }
+            catch (Exception ex)
+            {
+              Console.WriteLine($"OPENAI: Failed to send chunk {i + 1}: {ex.Message}");
+            }
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"Error sending response: {ex.Message}");
+        try
+        {
+          await discordMessage.ModifyAsync("I had an error processing that request.");
+        }
+        catch
+        {
+          Console.WriteLine("Failed to send fallback message too.");
+        }
+      }
     }
+  }
+
+  private static List<string> SplitMessageImproved(string message)
+  {
+    // Maximum length of each message chunk (keeping well under Discord's 2000 limit)
+    const int maxChunkSize = 1900;
+    List<string> chunks = [];
+
+    // If the message is already under the limit, just return it as a single chunk
+    if (message.Length <= maxChunkSize)
+    {
+      chunks.Add(message);
+      return chunks;
+    }
+
+    // Split by paragraphs first (double newlines)
+    string[] paragraphs = message.Split(["\n\n"], StringSplitOptions.None);
+    StringBuilder currentChunk = new();
+
+    foreach (string paragraph in paragraphs)
+    {
+      // If adding this paragraph would exceed the limit
+      if (currentChunk.Length + paragraph.Length + 2 > maxChunkSize)
+      {
+        // If the current chunk already has content, add it to chunks
+        if (currentChunk.Length > 0)
+        {
+          chunks.Add(currentChunk.ToString());
+          currentChunk.Clear();
+        }
+
+        // If the paragraph itself exceeds the limit, split it further
+        if (paragraph.Length > maxChunkSize)
+        {
+          // Split by sentences
+          string[] sentences = paragraph.Split([". ", "! ", "? "], StringSplitOptions.None);
+          foreach (string sentence in sentences)
+          {
+            if (currentChunk.Length + sentence.Length + 2 > maxChunkSize)
+            {
+              if (currentChunk.Length > 0)
+              {
+                chunks.Add(currentChunk.ToString());
+                currentChunk.Clear();
+              }
+
+              // If a single sentence is still too long, split it by words
+              if (sentence.Length > maxChunkSize)
+              {
+                string remaining = sentence;
+                while (remaining.Length > 0)
+                {
+                  int length = Math.Min(maxChunkSize, remaining.Length);
+                  // Try to find a space to split at
+                  if (length < remaining.Length)
+                  {
+                    int lastSpace = remaining.LastIndexOf(' ', length);
+                    if (lastSpace > 0)
+                      length = lastSpace;
+                  }
+                  chunks.Add(remaining[..length]);
+                  remaining = remaining[length..].TrimStart();
+                }
+              }
+              else
+              {
+                currentChunk.Append(sentence);
+              }
+            }
+            else
+            {
+              if (currentChunk.Length > 0 && !sentence.StartsWith('.') && !sentence.StartsWith('!') && !sentence.StartsWith('?'))
+                currentChunk.Append(". ");
+              currentChunk.Append(sentence);
+            }
+          }
+        }
+        else
+        {
+          // Start a new chunk with this paragraph
+          currentChunk.Append(paragraph);
+        }
+      }
+      else
+      {
+        // Add a separator between paragraphs if this isn't the first content
+        if (currentChunk.Length > 0)
+          currentChunk.Append("\n\n");
+
+        // Add the paragraph to the current chunk
+        currentChunk.Append(paragraph);
+      }
+    }
+
+    // Add the last chunk if it has content
+    if (currentChunk.Length > 0)
+      chunks.Add(currentChunk.ToString());
+
+    return chunks;
+  }
+
+  // Keep the old method as it might be used elsewhere
+  private static List<string> SplitMessage(string message)
+  {
+    List<string> chunks = [];
+    int maxLength = 1990;
+
+    for (int i = 0; i < message.Length; i += maxLength)
+    {
+      if (i + maxLength >= message.Length)
+      {
+        chunks.Add(message[i..]);
+      }
+      else
+      {
+        // Find the last space character before the limit to avoid cutting words
+        int lastSpace = message.LastIndexOf(' ', i + maxLength - 1, Math.Min(maxLength, message.Length - i));
+        if (lastSpace == -1 || lastSpace < i)
+        {
+          // If no space found, just cut at the maximum length
+          chunks.Add(message.Substring(i, maxLength));
+          i -= maxLength - maxLength; // Adjust i to account for the cut
+        }
+        else
+        {
+          chunks.Add(message[i..lastSpace]);
+          i = lastSpace; // Set i to the space position for the next iteration
+        }
+      }
+    }
+
+    return chunks;
   }
 
   private static async Task InteractionEventHandler(DiscordClient s, ComponentInteractionCreateEventArgs e)
